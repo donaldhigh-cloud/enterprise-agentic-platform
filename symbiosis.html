@@ -1291,26 +1291,14 @@ footer a:hover { color: var(--gold-soft); text-decoration: underline; }
   </footer>
 </div>
 
-<span class="cmd">Set-ExecutionPolicy RemoteSigned -Scope CurrentUser</span>
-<span class="comment"># Install OpenClaw</span>
-<span class="cmd">npm i -g openclaw</span>
-<span class="comment"># Run the setup wizard</span>
-<span class="cmd">openclaw onboard</span>
-<span class="comment"># Start the agent</span>
-<span class="cmd">openclaw gateway</span></div><p>The onboard wizard walks you through selecting Anthropic as your model provider, pasting your API key, choosing Discord as your channel, and configuring web search. About 15 minutes including Discord bot setup.</p></div><footer>Human-AI Symbiosis · Built on <a href="https://openclaw.ai" target="_blank">OpenClaw</a> + <a href="https://anthropic.com" target="_blank">Claude by Anthropic</a></footer></div>
-
 <script>
 function show(id, btn) {
-  document.querySelectorAll('.panel').forEach(function(p) { p.style.display = 'none'; p.classList.remove('active'); });
-  document.querySelectorAll('.nav-tab').forEach(function(t) { t.classList.remove('active'); });
-  var target = document.getElementById('panel-' + id);
-  if (target) { target.style.display = 'block'; target.classList.add('active'); }
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
   btn.classList.add('active');
   window.scrollTo({top: 0, behavior: 'smooth'});
 }
-document.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('.panel').forEach(function(p) { p.style.display = 'none'; });
-  var first = document.getElementById('panel-overview');
-  if (first) first.style.display = 'block';
-});
 </script>
+</body>
+</html>
