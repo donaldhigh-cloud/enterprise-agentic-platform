@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CTO Data Readiness Audit — Before You Buy AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f0f0f;
+    --paper: #f5f0e8;
+    --cream: #ede8dc;
+    --rule: #c8bfaa;
+    --accent: #c0392b;
+    --accent-dim: #e8d5d3;
+    --gold: #b8860b;
+    --green: #1a5e3a;
+    --green-dim: #d0e8da;
+    --amber: #b35c00;
+    --amber-dim: #f5e6d0;
+    --mono: 'DM Mono', monospace;
+    --serif: 'DM Serif Display', serif;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── TEXTURE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 60px 32px 100px;
+  }
+
+  /* ── HEADER ── */
+  .masthead {
+    border-top: 3px solid var(--ink);
+    border-bottom: 1px solid var(--rule);
+    padding: 28px 0 24px;
+    margin-bottom: 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .masthead-kicker {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  h1 {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    line-height: 1.1;
+    color: var(--ink);
+    margin-top: 8px;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .masthead-sub {
+    font-size: 14px;
+    color: #555;
+    margin-top: 10px;
+    line-height: 1.5;
+    max-width: 520px;
+  }
+
+  .timer-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    padding: 5px 12px;
+    margin-top: 16px;
+    width: fit-content;
+  }
+
+  /* ── MODE SWITCHER ── */
+  .mode-bar {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--rule);
+    width: fit-content;
+    margin-bottom: 44px;
+    overflow: hidden;
+  }
+
+  .mode-btn {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    border: none;
+    background: transparent;
+    color: #888;
+    cursor: pointer;
+    border-right: 1px solid var(--rule);
+    transition: all 0.15s;
+  }
+
+  .mode-btn:last-child { border-right: none; }
+
+  .mode-btn.active {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .mode-btn:not(.active):hover {
+    background: var(--cream);
+    color: var(--ink);
+  }
+
+  /* ── MODES ── */
+  .mode-panel { display: none; }
+  .mode-panel.active { display: block; }
+
+  /* ── QUIZ MODE ── */
+  .question-block {
+    border-left: 3px solid var(--rule);
+    padding: 0 0 36px 28px;
+    margin-bottom: 0;
+    position: relative;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.4s, transform 0.4s;
+  }
+
+  .question-block.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .q-number {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .q-text {
+    font-family: var(--serif);
+    font-size: 1.25rem;
+    line-height: 1.4;
+    color: var(--ink);
+    margin-bottom: 20px;
+  }
+
+  .q-context {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.55;
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    background: var(--cream);
+    border-left: 2px solid var(--rule);
+    font-style: italic;
+  }
+
+  .answer-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .answer-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    border: 1px solid var(--rule);
+    background: white;
+    cursor: pointer;
+    text-align: left;
+    font-family: var(--sans);
+    font-size: 14px;
+    color: var(--ink);
+    transition: all 0.15s;
+    position: relative;
+  }
+
+  .answer-btn:hover {
+    border-color: var(--ink);
+    background: var(--cream);
+  }
+
+  .answer-btn.selected {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .answer-btn.selected .ans-marker {
+    border-color: var(--paper);
+    background: var(--paper);
+  }
+
+  .answer-btn.selected .ans-marker::after {
+    content: '';
+    display: block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--ink);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .ans-marker {
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid var(--rule);
+    border-radius: 50%;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .divider-line {
+    height: 1px;
+    background: var(--rule);
+    margin: 32px 0;
+  }
+
+  .score-btn {
+    margin-top: 40px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 16px 32px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .score-btn:hover { opacity: 0.88; }
+  .score-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  /* ── RESULTS ── */
+  .results-panel {
+    display: none;
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  .results-panel.show { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .score-display {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .score-num {
+    font-family: var(--serif);
+    font-size: 5rem;
+    line-height: 1;
+  }
+
+  .score-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #888;
+    padding-bottom: 12px;
+  }
+
+  .verdict {
+    padding: 28px 32px;
+    margin-bottom: 36px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .verdict::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+  }
+
+  .verdict.red { background: var(--accent-dim); }
+  .verdict.red::before { background: var(--accent); }
+  .verdict.amber { background: var(--amber-dim); }
+  .verdict.amber::before { background: var(--amber); }
+  .verdict.green { background: var(--green-dim); }
+  .verdict.green::before { background: var(--green); }
+
+  .verdict-kicker {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .verdict.red .verdict-kicker { color: var(--accent); }
+  .verdict.amber .verdict-kicker { color: var(--amber); }
+  .verdict.green .verdict-kicker { color: var(--green); }
+
+  .verdict-title {
+    font-family: var(--serif);
+    font-size: 1.6rem;
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+
+  .verdict-text {
+    font-size: 14px;
+    line-height: 1.65;
+    color: #333;
+  }
+
+  .action-path {
+    margin-top: 36px;
+  }
+
+  .action-path-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 20px;
+  }
+
+  .action-step {
+    display: flex;
+    gap: 20px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .step-week {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    flex-shrink: 0;
+    padding-top: 3px;
+    width: 60px;
+  }
+
+  .step-content strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .step-content p {
+    font-size: 13px;
+    color: #555;
+    line-height: 1.55;
+  }
+
+  .restart-btn {
+    margin-top: 36px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 12px 24px;
+    border: 1px solid var(--rule);
+    background: transparent;
+    cursor: pointer;
+    color: var(--ink);
+    transition: all 0.15s;
+  }
+
+  .restart-btn:hover { background: var(--cream); }
+
+  /* ── FORM MODE ── */
+  .form-question {
+    padding: 24px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .form-label {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .form-hint {
+    font-size: 12px;
+    color: #777;
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+
+  .toggle-group {
+    display: flex;
+    gap: 0;
+  }
+
+  .toggle-opt {
+    flex: 1;
+    padding: 12px;
+    text-align: center;
+    border: 1px solid var(--rule);
+    border-right: none;
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #888;
+    transition: all 0.15s;
+    background: white;
+  }
+
+  .toggle-opt:last-child { border-right: 1px solid var(--rule); }
+  .toggle-opt:hover { background: var(--cream); color: var(--ink); }
+  .toggle-opt.selected { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .toggle-opt.selected + .toggle-opt { border-left-color: var(--ink); }
+
+  .form-score-btn {
+    margin-top: 36px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 16px 32px;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .form-score-btn:hover { opacity: 0.82; }
+  .form-score-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  /* ── PRINT MODE ── */
+  .print-card {
+    background: white;
+    border: 1px solid var(--rule);
+    padding: 48px;
+  }
+
+  .print-header {
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 20px;
+    margin-bottom: 28px;
+  }
+
+  .print-header h2 {
+    font-family: var(--serif);
+    font-size: 1.8rem;
+    margin-top: 6px;
+  }
+
+  .print-header p {
+    font-size: 13px;
+    color: #666;
+    margin-top: 6px;
+  }
+
+  .print-section-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 28px 0 14px;
+  }
+
+  .print-q {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--cream);
+  }
+
+  .print-q-text {
+    flex: 1;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .print-boxes {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .print-box {
+    width: 36px;
+    height: 28px;
+    border: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    color: #999;
+  }
+
+  .scoring-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-top: 14px;
+  }
+
+  .score-card {
+    padding: 14px;
+    border: 1px solid var(--rule);
+    background: var(--cream);
+  }
+
+  .score-card .sc-score {
+    font-family: var(--mono);
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+
+  .score-card .sc-label {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .score-card .sc-text {
+    font-size: 11px;
+    color: #666;
+    line-height: 1.45;
+  }
+
+  .print-footer {
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    font-family: var(--mono);
+    font-size: 10px;
+    color: #aaa;
+    letter-spacing: 0.08em;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .print-action-btn {
+    margin-top: 24px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 12px 24px;
+    border: 1px solid var(--ink);
+    background: transparent;
+    cursor: pointer;
+    color: var(--ink);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.15s;
+  }
+
+  .print-action-btn:hover { background: var(--ink); color: var(--paper); }
+
+  @media print {
+    body { background: white; }
+    body::before { display: none; }
+    .mode-bar, .print-action-btn, .masthead-sub, .timer-badge { display: none; }
+    .mode-panel { display: block !important; }
+    #mode-quiz, #mode-form { display: none !important; }
+  }
+
+  @media (max-width: 600px) {
+    .wrap { padding: 32px 20px 80px; }
+    .scoring-grid { grid-template-columns: 1fr; }
+    .print-boxes { display: none; }
+    .print-card { padding: 28px 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <span class="masthead-kicker">Executive Assessment Tool</span>
+    <h1>CTO Data Readiness Audit<br><em>Before You Buy AI</em></h1>
+    <p class="masthead-sub">Three diagnostic questions reveal whether your data architecture is ready to support AI — or whether you're about to build on a cracked foundation.</p>
+    <span class="timer-badge">⏱ 5 minutes</span>
+  </div>
+
+  <div class="mode-bar">
+    <button class="mode-btn active" onclick="switchMode('quiz')">Interactive Quiz</button>
+    <button class="mode-btn" onclick="switchMode('form')">Assessment Form</button>
+    <button class="mode-btn" onclick="switchMode('print')">Printable</button>
+  </div>
+
+  <!-- ══════════════════ QUIZ MODE ══════════════════ -->
+  <div class="mode-panel active" id="mode-quiz">
+    <div id="quiz-questions">
+
+      <div class="question-block visible" id="q1">
+        <div class="q-number">Question 01 of 03</div>
+        <div class="q-text">Have your critical data sources experienced schema drift for three or more years?</div>
+        <div class="q-context">Schema drift happens when columns get added, renamed, or repurposed over time without formal governance. After three years it compounds — and AI can't learn from a moving target.</div>
+        <div class="answer-group">
+          <button class="answer-btn" onclick="selectAnswer('q1', 'yes', this)">
+            <span class="ans-marker"></span> Yes — schemas have changed significantly and we haven't always tracked why
+          </button>
+          <button class="answer-btn" onclick="selectAnswer('q1', 'partial', this)">
+            <span class="ans-marker"></span> Partially — some sources have drifted, others are well-governed
+          </button>
+          <button class="answer-btn" onclick="selectAnswer('q1', 'no', this)">
+            <span class="ans-marker"></span> No — schema changes are documented and governed
+          </button>
+        </div>
+      </div>
+
+      <div class="divider-line"></div>
+
+      <div class="question-block" id="q2">
+        <div class="q-number">Question 02 of 03</div>
+        <div class="q-text">Do basic business questions take longer than five seconds to answer?</div>
+        <div class="q-context">Query latency is a proxy for architectural health. If business questions require ETL runs, data team intervention, or manual joins, your gold layer isn't working for you.</div>
+        <div class="answer-group">
+          <button class="answer-btn" onclick="selectAnswer('q2', 'yes', this)">
+            <span class="ans-marker"></span> Yes — most queries require waiting, scheduling, or a data team ticket
+          </button>
+          <button class="answer-btn" onclick="selectAnswer('q2', 'partial', this)">
+            <span class="ans-marker"></span> Mixed — dashboards are fast but ad-hoc questions take time
+          </button>
+          <button class="answer-btn" onclick="selectAnswer('q2', 'no', this)">
+            <span class="ans-marker"></span> No — business users get answers in seconds from self-serve tools
+          </button>
+        </div>
+      </div>
+
+      <div class="divider-line"></div>
+
+      <div class="question-block" id="q3">
+        <div class="q-number">Question 03 of 03</div>
+        <div class="q-text">Are your data teams spending more than 50% of their time on ETL instead of analysis?</div>
+        <div class="q-context">When your best data minds are plumbers, you're not doing data work — you're doing data maintenance. AI amplifies analysis; it can't rescue teams trapped in pipeline work.</div>
+        <div class="answer-group">
+          <button class="answer-btn" onclick="selectAnswer('q3', 'yes', this)">
+            <span class="ans-marker"></span> Yes — most of our capacity goes to pipelines, not insights
+          </button>
+          <button class="answer-btn" onclick="selectAnswer('q3', 'partial', this)">
+            <span class="ans-marker"></span> Roughly 50/50 — we're working on improving the ratio
+          </button>
+          <button class="answer-btn" onclick="selectAnswer('q3', 'no', this)">
+            <span class="ans-marker"></span> No — our team spends most time on analysis and strategic work
+          </button>
+        </div>
+      </div>
+
+      <button class="score-btn" id="quiz-submit" onclick="calcScore('quiz')" disabled>
+        Calculate My Score →
+      </button>
+    </div>
+
+    <div class="results-panel" id="quiz-results">
+      <div class="score-display">
+        <div class="score-num" id="quiz-score-num">—</div>
+        <div class="score-label">out of 3<br>critical issues flagged</div>
+      </div>
+      <div id="quiz-verdict"></div>
+      <div class="action-path" id="quiz-action-path"></div>
+      <button class="restart-btn" onclick="restart('quiz')">← Retake Assessment</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════ FORM MODE ══════════════════ -->
+  <div class="mode-panel" id="mode-form">
+    <div id="form-questions">
+      <div class="form-question">
+        <label class="form-label">1. Schema Drift</label>
+        <p class="form-hint">Have your critical data sources experienced schema drift for 3+ years? Persistent schema changes lead to inconsistencies and AI comprehension failures.</p>
+        <div class="toggle-group">
+          <div class="toggle-opt" onclick="formSelect(this, 'f1', 'yes')">Yes</div>
+          <div class="toggle-opt" onclick="formSelect(this, 'f1', 'partial')">Partially</div>
+          <div class="toggle-opt" onclick="formSelect(this, 'f1', 'no')">No</div>
+        </div>
+      </div>
+
+      <div class="form-question">
+        <label class="form-label">2. Business Question Response Time</label>
+        <p class="form-hint">Do basic business questions take longer than 5 seconds to answer? Slow response times signal infrastructure or governance problems.</p>
+        <div class="toggle-group">
+          <div class="toggle-opt" onclick="formSelect(this, 'f2', 'yes')">Yes</div>
+          <div class="toggle-opt" onclick="formSelect(this, 'f2', 'partial')">Mixed</div>
+          <div class="toggle-opt" onclick="formSelect(this, 'f2', 'no')">No</div>
+        </div>
+      </div>
+
+      <div class="form-question">
+        <label class="form-label">3. Data Team Workload Split</label>
+        <p class="form-hint">Are your data teams spending more than 50% of their time on ETL instead of actual analysis? A disproportionate ETL burden signals infrastructure debt.</p>
+        <div class="toggle-group">
+          <div class="toggle-opt" onclick="formSelect(this, 'f3', 'yes')">Yes</div>
+          <div class="toggle-opt" onclick="formSelect(this, 'f3', 'partial')">~50/50</div>
+          <div class="toggle-opt" onclick="formSelect(this, 'f3', 'no')">No</div>
+        </div>
+      </div>
+
+      <button class="form-score-btn" id="form-submit" onclick="calcScore('form')" disabled>
+        Score My Assessment →
+      </button>
+    </div>
+
+    <div class="results-panel" id="form-results">
+      <div class="score-display">
+        <div class="score-num" id="form-score-num">—</div>
+        <div class="score-label">out of 3<br>critical issues flagged</div>
+      </div>
+      <div id="form-verdict"></div>
+      <div class="action-path" id="form-action-path"></div>
+      <button class="restart-btn" onclick="restart('form')">← Reassess</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════ PRINT MODE ══════════════════ -->
+  <div class="mode-panel" id="mode-print">
+    <div class="print-card" id="printable-card">
+      <div class="print-header">
+        <div class="masthead-kicker" style="color:var(--accent);font-family:var(--mono);font-size:10px;letter-spacing:0.16em;text-transform:uppercase;">Executive Assessment Tool</div>
+        <h2>CTO Data Readiness Audit</h2>
+        <p>Complete honestly. One checkmark per question. Score at the bottom. <strong>5 minutes.</strong></p>
+      </div>
+
+      <div class="print-section-title">Assessment Questions</div>
+
+      <div class="print-q">
+        <div class="print-q-text">
+          <strong>1. Schema Drift</strong><br>
+          Have your critical data sources experienced schema drift for 3 or more years?
+        </div>
+        <div class="print-boxes">
+          <div class="print-box">YES</div>
+          <div class="print-box">NO</div>
+        </div>
+      </div>
+
+      <div class="print-q">
+        <div class="print-q-text">
+          <strong>2. Query Response Time</strong><br>
+          Do basic business questions take longer than 5 seconds to answer?
+        </div>
+        <div class="print-boxes">
+          <div class="print-box">YES</div>
+          <div class="print-box">NO</div>
+        </div>
+      </div>
+
+      <div class="print-q">
+        <div class="print-q-text">
+          <strong>3. ETL Burden</strong><br>
+          Are data teams spending more than 50% of their time on ETL vs. analysis?
+        </div>
+        <div class="print-boxes">
+          <div class="print-box">YES</div>
+          <div class="print-box">NO</div>
+        </div>
+      </div>
+
+      <div class="print-section-title" style="margin-top:32px;">Scoring Guide</div>
+      <div class="scoring-grid">
+        <div class="score-card">
+          <div class="sc-score" style="color:var(--accent);">3 / 3</div>
+          <div class="sc-label">Critical Data Debt</div>
+          <div class="sc-text">Immediate action required. Begin Week 1 of the readiness protocol without delay.</div>
+        </div>
+        <div class="score-card">
+          <div class="sc-score" style="color:var(--amber);">2 / 3</div>
+          <div class="sc-label">Data Debt Increasing</div>
+          <div class="sc-text">Begin protocol within 30 days to prevent further deterioration.</div>
+        </div>
+        <div class="score-card">
+          <div class="sc-score" style="color:var(--green);">1 / 3</div>
+          <div class="sc-label">Act Now</div>
+          <div class="sc-text">Address issues before they compound. Start the 4-Week Action Path.</div>
+        </div>
+      </div>
+
+      <div class="print-section-title" style="margin-top:32px;">4-Week Action Path (Brief)</div>
+      <div class="print-q"><div class="print-q-text"><strong>Week 1 — Discovery</strong> &nbsp;·&nbsp; Identify 5 critical data sources. Collect 2-year samples. List 3 unanswered questions per source. Run AI schema analysis.</div></div>
+      <div class="print-q"><div class="print-q-text"><strong>Week 2 — Target Design</strong> &nbsp;·&nbsp; Define business rules, latency needs, governance. Have AI propose normalized schema + Medallion architecture. Challenge every AI assertion about data relationships.</div></div>
+      <div class="print-q"><div class="print-q-text"><strong>Weeks 3–4 — Pilot Transformation</strong> &nbsp;·&nbsp; Select pilot data source. Run transformation through Bronze → Silver → Gold layers. Validate with real users against defined success metrics.</div></div>
+
+      <div class="print-footer">
+        <span>CTO Data Readiness Audit — Data Hygiene Protocol</span>
+        <span>From: <em>Humans on Purpose — Redefining Leadership in the Agentic Age</em></span>
+      </div>
+    </div>
+
+    <button class="print-action-btn" onclick="window.print()">
+      🖨 Print / Save as PDF
+    </button>
+  </div>
+
+</div><!-- end .wrap -->
+
+<script>
+  const quizAnswers = { q1: null, q2: null, q3: null };
+  const formAnswers = { f1: null, f2: null, f3: null };
+
+  function switchMode(mode) {
+    document.querySelectorAll('.mode-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('mode-' + mode).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  function selectAnswer(qId, val, btn) {
+    quizAnswers[qId] = val;
+    btn.closest('.answer-group').querySelectorAll('.answer-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+
+    // Reveal next question
+    const nums = { q1: 'q2', q2: 'q3' };
+    if (nums[qId]) {
+      const next = document.getElementById(nums[qId]);
+      setTimeout(() => next.classList.add('visible'), 120);
+    }
+
+    const allAnswered = Object.values(quizAnswers).every(v => v !== null);
+    document.getElementById('quiz-submit').disabled = !allAnswered;
+  }
+
+  function formSelect(el, fId, val) {
+    formAnswers[fId] = val;
+    el.closest('.toggle-group').querySelectorAll('.toggle-opt').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    const allAnswered = Object.values(formAnswers).every(v => v !== null);
+    document.getElementById('form-submit').disabled = !allAnswered;
+  }
+
+  function scoreAnswers(answers) {
+    // Count "yes" and "partial" as issues (partial = 0.5 but we round up for safety messaging)
+    let issues = 0;
+    Object.values(answers).forEach(v => {
+      if (v === 'yes') issues++;
+      else if (v === 'partial') issues++;
+    });
+    return issues;
+  }
+
+  function getVerdict(score) {
+    if (score === 3) return {
+      cls: 'red',
+      kicker: 'Critical Data Debt',
+      title: 'Your AI initiative is at risk before it starts.',
+      text: 'All three warning signs are present. You are carrying critical data debt. Launching AI initiatives on top of this foundation will amplify existing problems, not solve them. This isn\'t a reason to stop — it\'s a reason to start the right way. Begin Week 1 of the readiness protocol immediately.',
+    };
+    if (score === 2) return {
+      cls: 'amber',
+      kicker: 'Data Debt Increasing',
+      title: 'You have a 30-day window before this gets harder.',
+      text: 'Two out of three warning signs are active, and data debt compounds. The good news: you\'re not in crisis. The risk: inaction turns manageable debt into structural drag. Start the 4-Week Action Path within the next 30 days to get ahead of it.',
+    };
+    if (score === 1) return {
+      cls: 'amber',
+      kicker: 'One Issue Flagged',
+      title: 'Act now — one issue unchecked becomes three.',
+      text: 'You\'re in better shape than most, but one structural issue left unaddressed creates the conditions for the others. Use the Schema Health Report from Week 1 to identify whether this is an isolated problem or an early signal of broader drift.',
+    };
+    return {
+      cls: 'green',
+      kicker: 'Strong Foundation',
+      title: 'Your data architecture is AI-ready.',
+      text: 'No critical warning signs flagged. Your organization has the governance discipline and architectural clarity that most AI initiatives lack. You\'re positioned to move directly to model selection and deployment. Use the Week 2 Target Design session to document your readiness formally before scaling.',
+    };
+  }
+
+  function getActionPath(score) {
+    const steps = score >= 2 ? [
+      { week: 'Week 1', title: 'Discovery Sprint (4–8 hrs)', text: 'Identify your 5 most critical data sources. Export 2-year samples. List 3 unanswered business questions per source. Run an AI schema analysis to surface structural issues.' },
+      { week: 'Week 2', title: 'Target Design (8–12 hrs)', text: 'Define business rules, latency needs, and governance requirements. Have AI propose a normalized schema and Medallion architecture. Challenge every AI assertion about data relationships — structural similarity is not semantic equivalence.' },
+      { week: 'Wks 3–4', title: 'Pilot Transformation (20–30 hrs)', text: 'Select your most problematic data source as the pilot. Run transformation through Bronze → Silver → Gold layers. Validate row counts, checksums, and business rule enforcement with real end users.' },
+    ] : score === 1 ? [
+      { week: 'This Week', title: 'Monday Morning Kickstart (30 min)', text: 'Identify your single most problematic data source. Export 2–3 samples from different time periods. Define 3 questions it should answer but can\'t. Start an AI conversation: "I have problematic data. Help me identify structural issues and a normalized target."' },
+      { week: 'Week 2', title: 'Schema Health Report', text: 'Expand the Monday kickstart into a full Week 1 Discovery Sprint across your 5 most critical data sources. Document schema evolution and produce a prioritized problem list.' },
+    ] : [
+      { week: 'Now', title: 'Document Your Readiness', text: 'Capture your current governance standards, schema documentation, and query performance benchmarks. This becomes your AI readiness baseline.' },
+      { week: 'Week 2', title: 'Begin Target Design', text: 'Skip directly to Week 2 of the Action Path: define the Medallion Architecture for your highest-value AI use case and begin the pilot transformation.' },
+    ];
+
+    return `
+      <div class="action-path-title">Your Recommended Action Path</div>
+      ${steps.map(s => `
+        <div class="action-step">
+          <div class="step-week">${s.week}</div>
+          <div class="step-content">
+            <strong>${s.title}</strong>
+            <p>${s.text}</p>
+          </div>
+        </div>
+      `).join('')}
+    `;
+  }
+
+  function calcScore(mode) {
+    const answers = mode === 'quiz' ? quizAnswers : { f1: formAnswers.f1, f2: formAnswers.f2, f3: formAnswers.f3 };
+    const mappedAnswers = {};
+    Object.keys(answers).forEach((k, i) => mappedAnswers['x'+i] = answers[k]);
+    const score = scoreAnswers(mappedAnswers);
+
+    const verdict = getVerdict(score);
+    const actionHTML = getActionPath(score);
+
+    const prefix = mode === 'quiz' ? 'quiz' : 'form';
+    document.getElementById(`${prefix}-score-num`).textContent = score;
+    document.getElementById(`${prefix}-verdict`).innerHTML = `
+      <div class="verdict ${verdict.cls}">
+        <div class="verdict-kicker">${verdict.kicker}</div>
+        <div class="verdict-title">${verdict.title}</div>
+        <div class="verdict-text">${verdict.text}</div>
+      </div>
+    `;
+    document.getElementById(`${prefix}-action-path`).innerHTML = actionHTML;
+
+    document.getElementById(`${prefix}-questions`).style.display = 'none';
+    document.getElementById(`${prefix}-results`).classList.add('show');
+  }
+
+  function restart(mode) {
+    const prefix = mode === 'quiz' ? 'quiz' : 'form';
+    document.getElementById(`${prefix}-questions`).style.display = '';
+    document.getElementById(`${prefix}-results`).classList.remove('show');
+
+    if (mode === 'quiz') {
+      Object.keys(quizAnswers).forEach(k => quizAnswers[k] = null);
+      document.querySelectorAll('.answer-btn').forEach(b => b.classList.remove('selected'));
+      document.getElementById('quiz-submit').disabled = true;
+      document.getElementById('q2').classList.remove('visible');
+      document.getElementById('q3').classList.remove('visible');
+    } else {
+      Object.keys(formAnswers).forEach(k => formAnswers[k] = null);
+      document.querySelectorAll('.toggle-opt').forEach(o => o.classList.remove('selected'));
+      document.getElementById('form-submit').disabled = true;
+    }
+  }
+</script>
+</body>
+</html>
