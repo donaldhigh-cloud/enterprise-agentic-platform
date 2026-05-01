@@ -1,0 +1,1047 @@
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enterprise Agentic Platform Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;family=DM+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+:root {
+  --purple: #7c3aed; --purple-l: #faf5ff; --purple-b: #c084fc; --purple-d: #4c1d95;
+  --teal: #0f766e; --teal-l: #f0fdfa; --teal-b: #5eead4; --teal-d: #134e4a;
+  --orange: #c2410c; --orange-l: #fff7ed; --orange-b: #fb923c; --orange-d: #7c2d12;
+  --blue: #1d4ed8; --blue-l: #eff6ff; --blue-b: #60a5fa; --blue-d: #1e3a8a;
+  --green: #15803d; --green-l: #f0fdf4; --green-b: #4ade80; --green-d: #14532d;
+  --pink: #be185d; --pink-l: #fdf2f8; --pink-b: #f472b6; --pink-d: #831843;
+  --gray-50: #f8fafc; --gray-100: #f1f5f9; --gray-200: #e2e8f0;
+  --gray-400: #94a3b8; --gray-600: #475569; --gray-900: #0f172a;
+  --font: 'Plus Jakarta Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+  --radius: 12px; --radius-sm: 8px;
+  --shadow: 0 4px 24px rgba(0,0,0,.07);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,.12);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font); background: #fff; color: var(--gray-900); line-height: 1.6; overflow-x: hidden; }
+
+/* NAV */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--gray-200);
+  padding: 0 32px;
+  display: flex; align-items: center; gap: 0; height: 60px;
+}
+.nav-brand {
+  font-size: 13px; font-weight: 800; color: var(--purple); letter-spacing: -.01em;
+  margin-right: 32px; white-space: nowrap; cursor: pointer; text-decoration: none;
+}
+.nav-links { display: flex; gap: 2px; flex: 1; overflow-x: auto; scrollbar-width: none; }
+.nav-links::-webkit-scrollbar { display: none; }
+.nav-btn {
+  background: none; border: none; font-family: var(--font);
+  font-size: 12px; font-weight: 600; color: var(--gray-400);
+  padding: 6px 12px; border-radius: 6px; cursor: pointer;
+  white-space: nowrap; transition: all .15s;
+}
+.nav-btn:hover { color: var(--gray-900); background: var(--gray-100); }
+.nav-btn.active { color: var(--purple); background: var(--purple-l); }
+
+/* PAGES */
+.page { display: none; min-height: calc(100vh - 60px); animation: fadeIn .3s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* HERO */
+.hero {
+  background: linear-gradient(135deg, #faf5ff 0%, #eff6ff 50%, #f0fdfa 100%);
+  padding: 72px 48px 60px; position: relative; overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; top: -120px; right: -80px;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(124,58,237,.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-kicker { font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--purple); margin-bottom: 12px; }
+.hero h1 { font-size: clamp(32px,5vw,56px); font-weight: 800; line-height: 1.05; letter-spacing: -.02em; color: var(--gray-900); margin-bottom: 16px; }
+.hero h1 span { color: var(--purple); }
+.hero-sub { font-size: 17px; color: var(--gray-600); max-width: 560px; line-height: 1.7; margin-bottom: 36px; }
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn-primary {
+  background: var(--purple); color: #fff; font-family: var(--font);
+  font-size: 14px; font-weight: 700; padding: 12px 24px; border-radius: var(--radius-sm);
+  border: none; cursor: pointer; transition: all .15s; letter-spacing: -.01em;
+}
+.btn-primary:hover { background: var(--purple-d); transform: translateY(-1px); box-shadow: var(--shadow); }
+.btn-outline {
+  background: transparent; color: var(--purple); font-family: var(--font);
+  font-size: 14px; font-weight: 700; padding: 12px 24px; border-radius: var(--radius-sm);
+  border: 2px solid var(--purple-b); cursor: pointer; transition: all .15s;
+}
+.btn-outline:hover { background: var(--purple-l); }
+
+/* CONTENT WRAPPER */
+.content { max-width: 900px; margin: 0 auto; padding: 48px 32px 80px; }
+.content-wide { max-width: 1100px; margin: 0 auto; padding: 48px 32px 80px; }
+
+/* SECTION HEADERS */
+.sec-label { font-family: var(--mono); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+.sec-label::after { content: ''; flex: 1; height: 1px; background: var(--gray-200); }
+.page-title { font-size: clamp(24px,3vw,36px); font-weight: 800; letter-spacing: -.02em; margin-bottom: 8px; }
+.page-sub { font-size: 15px; color: var(--gray-600); line-height: 1.7; max-width: 600px; margin-bottom: 36px; }
+
+/* LAYER STACK (home) */
+.stack { display: flex; flex-direction: column; gap: 3px; }
+.layer-row { display: flex; gap: 10px; align-items: stretch; }
+.layer-num { width: 32px; min-width: 32px; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 10px; font-weight: 500; color: var(--gray-400); }
+.layer-card {
+  flex: 1; border-radius: var(--radius); padding: 18px 22px;
+  border: 1.5px solid; cursor: pointer; transition: all .18s;
+  position: relative; overflow: hidden;
+}
+.layer-card:hover { transform: translateX(4px); box-shadow: var(--shadow); }
+.layer-card::before { content: '→'; position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-size: 18px; opacity: 0; transition: opacity .15s; }
+.layer-card:hover::before { opacity: .4; }
+.lc-title { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+.lc-sub { font-size: 12px; line-height: 1.5; margin-bottom: 10px; }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip { font-family: var(--mono); font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 20px; letter-spacing: .03em; }
+.connector { display: flex; align-items: center; padding: 0 0 0 42px; height: 14px; }
+.conn-line { flex: 1; height: 2px; border-radius: 2px; opacity: .35; }
+
+/* Layer color themes */
+.l-purple { background: #faf5ff; border-color: #c084fc; }
+.l-purple .lc-title { color: #6d28d9; }
+.l-purple .lc-sub { color: #7c3aed; }
+.l-purple .chip { background: #ede9fe; color: #5b21b6; }
+
+.l-orange { background: #fff7ed; border-color: #fb923c; }
+.l-orange .lc-title { color: #c2410c; }
+.l-orange .lc-sub { color: #9a3412; }
+.l-orange .chip { background: #ffedd5; color: #9a3412; }
+
+.l-teal { background: #f0fdfa; border-color: #34d399; }
+.l-teal .lc-title { color: #047857; }
+.l-teal .lc-sub { color: #065f46; }
+.l-teal .chip { background: #d1fae5; color: #065f46; }
+
+.l-blue { background: #eff6ff; border-color: #60a5fa; }
+.l-blue .lc-title { color: #1d4ed8; }
+.l-blue .lc-sub { color: #1e40af; }
+.l-blue .chip { background: #dbeafe; color: #1e40af; }
+
+.l-violet { background: #f5f3ff; border-color: #a78bfa; }
+.l-violet .lc-title { color: #6d28d9; }
+.l-violet .lc-sub { color: #5b21b6; }
+.l-violet .chip { background: #ede9fe; color: #5b21b6; }
+
+.l-green { background: #f0fdf4; border-color: #4ade80; }
+.l-green .lc-title { color: #15803d; }
+.l-green .lc-sub { color: #166534; }
+.l-green .chip { background: #dcfce7; color: #166534; }
+
+/* CARDS GRID */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 14px; margin: 20px 0; }
+.card {
+  background: #fff; border: 1.5px solid var(--gray-200); border-radius: var(--radius);
+  padding: 20px; cursor: pointer; transition: all .18s; box-shadow: var(--shadow);
+}
+.card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--purple-b); }
+.card-icon { width: 40px; height: 40px; border-radius: 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; }
+.card-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; color: var(--gray-900); }
+.card-body { font-size: 12px; color: var(--gray-600); line-height: 1.6; }
+
+/* DETAIL PANELS */
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 20px 0; }
+.detail-card {
+  border-radius: var(--radius); padding: 20px; border: 1.5px solid;
+  cursor: pointer; transition: transform .15s;
+}
+.detail-card:hover { transform: translateY(-2px); }
+.detail-card .dc-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+.detail-card .dc-body { font-size: 12px; line-height: 1.7; }
+.detail-card .dc-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+.detail-card .dc-tag { font-family: var(--mono); font-size: 10px; padding: 2px 8px; border-radius: 20px; }
+
+/* PIPELINE */
+.pipeline { display: flex; align-items: center; gap: 0; overflow-x: auto; margin: 20px 0; padding-bottom: 4px; }
+.pipeline::-webkit-scrollbar { height: 4px; }
+.pipeline::-webkit-scrollbar-track { background: var(--gray-100); border-radius: 2px; }
+.pipeline::-webkit-scrollbar-thumb { background: var(--purple-b); border-radius: 2px; }
+.pipe-node {
+  flex-shrink: 0; min-width: 130px; background: var(--gray-50);
+  border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm);
+  padding: 12px 14px; text-align: center;
+}
+.pipe-node.highlight { background: var(--purple-l); border-color: var(--purple-b); }
+.pipe-node .pn-title { font-size: 12px; font-weight: 700; color: var(--gray-900); margin-bottom: 3px; }
+.pipe-node .pn-sub { font-size: 10px; color: var(--gray-400); }
+.pipe-node.highlight .pn-title { color: var(--purple); }
+.pipe-arrow { flex-shrink: 0; padding: 0 8px; color: var(--gray-400); font-size: 18px; }
+
+/* CALLOUT BOXES */
+.callout {
+  border-radius: var(--radius); padding: 20px 24px; margin: 24px 0;
+  display: flex; gap: 16px; align-items: flex-start;
+}
+.callout-accent { width: 4px; min-width: 4px; border-radius: 4px; align-self: stretch; }
+.callout-title { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 6px; }
+.callout-body { font-size: 13px; line-height: 1.7; }
+
+.callout-purple { background: var(--purple-l); border: 1.5px solid var(--purple-b); }
+.callout-purple .callout-accent { background: var(--purple); }
+.callout-purple .callout-title { color: var(--purple); }
+.callout-purple .callout-body { color: var(--purple-d); }
+
+.callout-teal { background: var(--teal-l); border: 1.5px solid var(--teal-b); }
+.callout-teal .callout-accent { background: var(--teal); }
+.callout-teal .callout-title { color: var(--teal); }
+.callout-teal .callout-body { color: var(--teal-d); }
+
+.callout-orange { background: var(--orange-l); border: 1.5px solid var(--orange-b); }
+.callout-orange .callout-accent { background: var(--orange); }
+.callout-orange .callout-title { color: var(--orange); }
+.callout-orange .callout-body { color: var(--orange-d); }
+
+.callout-red { background: #fff1f2; border: 1.5px solid #fda4af; }
+.callout-red .callout-accent { background: #e11d48; }
+.callout-red .callout-title { color: #e11d48; }
+.callout-red .callout-body { color: #881337; }
+
+/* PLATFORM GRID */
+.platform-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
+.platform-card {
+  background: var(--gray-50); border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-sm); padding: 16px; text-align: center;
+  cursor: pointer; transition: all .18s;
+}
+.platform-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+.platform-logo { width: 40px; height: 40px; border-radius: 10px; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; }
+.platform-name { font-size: 13px; font-weight: 700; color: var(--gray-900); margin-bottom: 2px; }
+.platform-tag { font-family: var(--mono); font-size: 10px; color: var(--gray-400); }
+
+/* FLOW DIAGRAM */
+.flow-diagram { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 28px; margin: 20px 0; }
+.flow-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+.flow-node {
+  background: #fff; border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm);
+  padding: 10px 14px; font-size: 12px; min-width: 120px;
+}
+.flow-node strong { display: block; font-size: 13px; font-weight: 700; color: var(--gray-900); margin-bottom: 2px; }
+.flow-node span { color: var(--gray-400); font-size: 11px; }
+.flow-node.fn-purple { background: var(--purple-l); border-color: var(--purple-b); }
+.flow-node.fn-purple strong { color: var(--purple); }
+.flow-node.fn-teal { background: var(--teal-l); border-color: var(--teal-b); }
+.flow-node.fn-teal strong { color: var(--teal); }
+.flow-node.fn-blue { background: var(--blue-l); border-color: var(--blue-b); }
+.flow-node.fn-blue strong { color: var(--blue); }
+.flow-node.fn-orange { background: var(--orange-l); border-color: var(--orange-b); }
+.flow-node.fn-orange strong { color: var(--orange); }
+.flow-arrow { color: var(--gray-400); font-size: 16px; font-weight: 700; flex-shrink: 0; }
+.flow-label { font-family: var(--mono); font-size: 10px; color: var(--purple); background: var(--purple-l); border: 1px solid var(--purple-b); padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+
+/* MEM TYPES */
+.mem-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin: 20px 0; }
+.mem-card {
+  border-radius: var(--radius); padding: 18px 14px; border: 1.5px solid;
+  text-align: center; cursor: pointer; transition: all .18s;
+}
+.mem-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+.mem-dot { width: 20px; height: 20px; border-radius: 50%; margin: 0 auto 10px; }
+.mem-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.mem-sub { font-size: 11px; line-height: 1.6; }
+.mem-badge { font-family: var(--mono); font-size: 9px; font-weight: 500; padding: 2px 8px; border-radius: 20px; margin-top: 8px; display: inline-block; }
+
+/* NEVER DEFER */
+.never-defer {
+  background: #fff1f2; border: 2px solid #fda4af; border-radius: var(--radius);
+  padding: 16px 20px; display: flex; align-items: center; gap: 14px; margin: 20px 0;
+}
+.nd-pill { background: #e11d48; color: #fff; font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 4px 12px; border-radius: 20px; white-space: nowrap; letter-spacing: .06em; }
+.nd-text { font-size: 13px; color: #881337; line-height: 1.5; }
+
+/* A2A BANNER */
+.a2a-banner {
+  background: var(--teal-l); border: 2px solid var(--teal-b); border-radius: var(--radius);
+  padding: 14px 20px; display: flex; align-items: center; gap: 14px; margin: 20px 0;
+}
+.a2a-pill { background: var(--teal); color: #fff; font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 4px 12px; border-radius: 20px; white-space: nowrap; letter-spacing: .06em; }
+.a2a-text { font-size: 13px; color: var(--teal-d); line-height: 1.5; }
+
+/* BIG INSIGHT */
+.big-insight {
+  background: linear-gradient(135deg, var(--purple-l), #eff6ff);
+  border: 2px solid var(--purple-b); border-radius: var(--radius);
+  padding: 28px 32px; margin: 32px 0; text-align: center;
+}
+.bi-quote { font-size: clamp(16px,2.5vw,22px); font-weight: 700; color: var(--purple-d); line-height: 1.5; letter-spacing: -.01em; }
+.bi-attr { font-family: var(--mono); font-size: 11px; color: var(--purple); margin-top: 12px; letter-spacing: .08em; }
+
+/* FOOTER */
+.page-footer { background: var(--gray-50); border-top: 1px solid var(--gray-200); padding: 32px 48px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.footer-label { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--gray-400); }
+
+/* BACK BUTTON */
+.back-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 600; color: var(--purple);
+  background: var(--purple-l); border: 1.5px solid var(--purple-b);
+  border-radius: var(--radius-sm); padding: 8px 14px;
+  cursor: pointer; margin-bottom: 24px; transition: all .15s;
+}
+.back-btn:hover { background: #ede9fe; }
+
+/* BREADCRUMB */
+.breadcrumb { font-family: var(--mono); font-size: 11px; color: var(--gray-400); margin-bottom: 8px; }
+.breadcrumb span { color: var(--purple); }
+
+/* RESPONSIVE */
+@media (max-width: 640px) {
+  .hero { padding: 48px 24px 40px; }
+  .content { padding: 32px 20px 60px; }
+  .detail-grid { grid-template-columns: 1fr; }
+  .mem-grid { grid-template-columns: 1fr 1fr; }
+  .platform-grid { grid-template-columns: 1fr 1fr; }
+  nav { padding: 0 16px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" onclick="showPage('home')">⬡ Agentic Platform</a>
+  <div class="nav-links">
+    <button class="nav-btn active" onclick="showPage('home')">Overview</button>
+    <button class="nav-btn" onclick="showPage('layer1')">Identity &amp; Memory</button>
+    <button class="nav-btn" onclick="showPage('layer2')">Data &amp; Infrastructure</button>
+    <button class="nav-btn" onclick="showPage('layer3')">A2A Coordination</button>
+    <button class="nav-btn" onclick="showPage('layer4')">Agentic Runtimes</button>
+    <button class="nav-btn" onclick="showPage('layer5')">Agentic Systems</button>
+    <button class="nav-btn" onclick="showPage('layer6')">Governance &amp; Trust</button>
+    <button class="nav-btn" onclick="showPage('salesforce')">Salesforce + MCP</button>
+    <a class="nav-btn" href="/symbiosis">Living Intelligence</a>
+  </div>
+</nav>
+
+<!-- ============================================================ HOME ============================================================ -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="hero-kicker">Next-generation infrastructure · 2025</div>
+    <h1>Enterprise Agentic<br><span>Platform Architecture</span></h1>
+    <p class="hero-sub">A ground-up framework for organizations ready to deploy agents that actually work — coordinated, trusted, and built to last. Click any layer to go deep.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="showPage('layer1')">Start with the Foundation →</button>
+      <button class="btn-outline" onclick="showPage('layer3')">See A2A Coordination</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="sec-label">Platform layers · foundation up</div>
+    <div class="stack">
+
+      <div class="layer-row">
+        <div class="layer-num">01</div>
+        <div class="layer-card l-purple" onclick="showPage('layer1')">
+          <div class="lc-title">Identity &amp; Memory Foundation</div>
+          <div class="lc-sub">The ground floor everything else stands on. Agents without stable identity and persistent memory are just fancy API calls.</div>
+          <div class="chips">
+            <span class="chip">Agent identity registry</span>
+            <span class="chip">Persistent memory store</span>
+            <span class="chip">Memory consolidation</span>
+            <span class="chip">Context manager</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="connector"><div class="conn-line" style="background:#fb923c"></div></div>
+
+      <div class="layer-row">
+        <div class="layer-num">02</div>
+        <div class="layer-card l-orange" onclick="showPage('layer2')">
+          <div class="lc-title">Data &amp; Infrastructure</div>
+          <div class="lc-sub">Data as a participant, not a record. Real-time pipelines, vector stores, compute — the engine room of the entire platform.</div>
+          <div class="chips">
+            <span class="chip">Medallion architecture</span>
+            <span class="chip">Vector &amp; semantic stores</span>
+            <span class="chip">Streaming fabric</span>
+            <span class="chip">MLOps</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="connector"><div class="conn-line" style="background:#34d399"></div></div>
+
+      <div class="layer-row">
+        <div class="layer-num">03</div>
+        <div class="layer-card l-teal" onclick="showPage('layer3')">
+          <div class="lc-title">A2A Communication &amp; Coordination</div>
+          <div class="lc-sub">Not a gateway. The nervous system. Agents routing work across platforms without humans in the loop.</div>
+          <div class="chips">
+            <span class="chip">MCP protocol layer</span>
+            <span class="chip">Agent-to-agent bus</span>
+            <span class="chip">Cross-platform connectors</span>
+            <span class="chip">Task delegation router</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="connector"><div class="conn-line" style="background:#60a5fa"></div></div>
+
+      <div class="layer-row">
+        <div class="layer-num">04</div>
+        <div class="layer-card l-blue" onclick="showPage('layer4')">
+          <div class="lc-title">Agentic Runtimes</div>
+          <div class="lc-sub">Where agents actually execute. Tool discovery, orchestration, evaluation loops, and observability — built in, not bolted on.</div>
+          <div class="chips">
+            <span class="chip">Tool registry &amp; discovery</span>
+            <span class="chip">Workflow orchestration</span>
+            <span class="chip">Evaluations engine</span>
+            <span class="chip">Observability &amp; tracing</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="connector"><div class="conn-line" style="background:#a78bfa"></div></div>
+
+      <div class="layer-row">
+        <div class="layer-num">05</div>
+        <div class="layer-card l-violet" onclick="showPage('layer5')">
+          <div class="lc-title">Agentic Systems</div>
+          <div class="lc-sub">From pre-built productivity agents to fully custom domain specialists — deployed on the right platform for the job.</div>
+          <div class="chips">
+            <span class="chip">Enterprise productivity</span>
+            <span class="chip">Highly custom agents</span>
+            <span class="chip">Purpose-fit agents</span>
+            <span class="chip">Workflow automation</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="connector"><div class="conn-line" style="background:#4ade80"></div></div>
+
+      <div class="layer-row">
+        <div class="layer-num">06</div>
+        <div class="layer-card l-green" onclick="showPage('layer6')">
+          <div class="lc-title">Governance &amp; Trust</div>
+          <div class="lc-sub">Trust is architectural. Controls live inside every layer — not as an audit wrapper bolted on after the fact.</div>
+          <div class="chips">
+            <span class="chip">Responsible AI controls</span>
+            <span class="chip">Compliance mapping</span>
+            <span class="chip">Human oversight hooks</span>
+            <span class="chip">Value assurance</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="a2a-banner" style="margin-top:16px">
+      <span class="a2a-pill">A2A First-Class</span>
+      <span class="a2a-text">Agent-to-agent coordination gets its own governance lane, identity model, and routing fabric — not a footnote in the interface row. <strong style="cursor:pointer;text-decoration:underline" onclick="showPage('layer3')">Learn more →</strong></span>
+    </div>
+
+    <div class="sec-label" style="margin-top:40px">Connected platforms</div>
+    <div class="platform-grid">
+      <div class="platform-card" onclick="showPage('salesforce')">
+        <div class="platform-logo" style="background:#e0f2fe;color:#0284c7">SF</div>
+        <div class="platform-name">Salesforce</div>
+        <div class="platform-tag">MCP · A2A · Deep dive →</div>
+      </div>
+      <div class="platform-card">
+        <div class="platform-logo" style="background:#fce7f3;color:#be185d">SN</div>
+        <div class="platform-name">ServiceNow</div>
+        <div class="platform-tag">MCP · A2A</div>
+      </div>
+      <div class="platform-card">
+        <div class="platform-logo" style="background:#fff7ed;color:#ea580c">DB</div>
+        <div class="platform-name">Databricks</div>
+        <div class="platform-tag">Data · ML</div>
+      </div>
+      <div class="platform-card">
+        <div class="platform-logo" style="background:#eff6ff;color:#2563eb">MS</div>
+        <div class="platform-name">Teams</div>
+        <div class="platform-tag">Comms · A2A</div>
+      </div>
+      <div class="platform-card">
+        <div class="platform-logo" style="background:#eef2ff;color:#4338ca">JI</div>
+        <div class="platform-name">Jira</div>
+        <div class="platform-tag">Workflow</div>
+      </div>
+      <div class="platform-card">
+        <div class="platform-logo" style="background:var(--gray-100);color:var(--gray-600)">LG</div>
+        <div class="platform-name">Legacy systems</div>
+        <div class="platform-tag">Kafka ingest</div>
+      </div>
+    </div>
+
+    <div class="big-insight">
+      <div class="bi-quote">"Every other framework starts with applications at the top and treats identity, memory, and governance as optional add-ons. This one inverts the stack — because an agent without stable identity and persistent memory isn't an agent. It's a chatbot in a trenchcoat."</div>
+      <div class="bi-attr">The inversion that changes everything</div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span class="footer-label">Enterprise Agentic Platform · 2025</span>
+    <span class="footer-label">Built for practitioners</span>
+  </div>
+</div>
+
+<!-- ============================================================ LAYER 1: IDENTITY & MEMORY ============================================================ -->
+<div id="page-layer1" class="page">
+  <div class="hero" style="background:linear-gradient(135deg,#faf5ff,#f5f3ff)">
+    <div class="breadcrumb">Overview <span>/ Layer 01</span></div>
+    <div class="hero-kicker" style="color:#7c3aed">Layer 01 · Foundation</div>
+    <h1 style="color:#4c1d95">Identity &amp; Memory<br><span style="color:#7c3aed">Foundation</span></h1>
+    <p class="hero-sub">The thing most enterprise agentic deployments get wrong. Without stable identity and persistent memory, everything you build above this layer is structurally unsound.</p>
+  </div>
+
+  <div class="content">
+    <button class="back-btn" onclick="showPage('home')">← Back to overview</button>
+
+    <div class="sec-label">Why this layer is non-negotiable</div>
+    <div class="callout callout-purple">
+      <div class="callout-accent"></div>
+      <div>
+        <div class="callout-title">The core problem</div>
+        <div class="callout-body">Every time a stateless agent handles a request, it starts from zero. No memory of prior interactions, no persistent identity, no continuity of context. It's like hiring a brilliant contractor who shows up every morning with amnesia. Technically capable — operationally useless at scale.</div>
+      </div>
+    </div>
+
+    <div class="sec-label">Agent identity model</div>
+    <div class="detail-grid">
+      <div class="detail-card" style="background:#fdf4ff;border-color:#d946ef">
+        <div class="dc-title" style="color:#7e22ce">Identity registry</div>
+        <div class="dc-body" style="color:#6b21a8">Every agent gets a stable, unique identity — persisted across sessions, scoped to its role. Not a session token. A first-class citizen in the system with its own permissions, history, and trust profile.</div>
+        <div class="dc-tags"><span class="dc-tag" style="background:#ede9fe;color:#5b21b6">Persistent ID</span><span class="dc-tag" style="background:#ede9fe;color:#5b21b6">Role-scoped</span></div>
+      </div>
+      <div class="detail-card" style="background:#fef3c7;border-color:#f59e0b">
+        <div class="dc-title" style="color:#92400e">Authorization &amp; permissions</div>
+        <div class="dc-body" style="color:#78350f">What tools can this agent call? What data can it touch? Permissions flow from identity — enforced at runtime, not assumed at design time. Least privilege by default.</div>
+        <div class="dc-tags"><span class="dc-tag" style="background:#fef3c7;color:#92400e">Runtime enforced</span><span class="dc-tag" style="background:#fef3c7;color:#92400e">Least privilege</span></div>
+      </div>
+      <div class="detail-card" style="background:#ecfdf5;border-color:#34d399">
+        <div class="dc-title" style="color:#065f46">A2A trust credentials</div>
+        <div class="dc-body" style="color:#047857">When Agent A calls Agent B, B needs to verify A's identity. Without a credential model, A2A is a security hole dressed up as a feature. Every cross-agent call requires mutual authentication.</div>
+        <div class="dc-tags"><span class="dc-tag" style="background:#d1fae5;color:#065f46">Mutual auth</span><span class="dc-tag" style="background:#d1fae5;color:#065f46">Cross-agent</span></div>
+      </div>
+      <div class="detail-card" style="background:#eff6ff;border-color:#60a5fa">
+        <div class="dc-title" style="color:#1e40af">Audit trail</div>
+        <div class="dc-body" style="color:#1d4ed8">Every action, every tool call, every decision — stamped to an agent identity. Compliance, debugging, and governance all depend on this. You can't govern what you can't trace.</div>
+        <div class="dc-tags"><span class="dc-tag" style="background:#dbeafe;color:#1e40af">Immutable log</span><span class="dc-tag" style="background:#dbeafe;color:#1e40af">Compliance ready</span></div>
+      </div>
+    </div>
+
+    <div class="sec-label">Four types of agent memory</div>
+    <div class="mem-grid">
+      <div class="mem-card" style="background:#fff7ed;border-color:#fb923c">
+        <div class="mem-dot" style="background:#fb923c"></div>
+        <div class="mem-title" style="color:#c2410c">Working memory</div>
+        <div class="mem-sub" style="color:#9a3412">Active context for the current task. The agent's live scratchpad. Brilliant but temporary.</div>
+        <div class="mem-badge" style="background:#ffedd5;color:#c2410c">In-context · resets</div>
+      </div>
+      <div class="mem-card" style="background:#fdf4ff;border-color:#d946ef">
+        <div class="mem-dot" style="background:#d946ef"></div>
+        <div class="mem-title" style="color:#7e22ce">Episodic memory</div>
+        <div class="mem-sub" style="color:#6b21a8">Records of past interactions, decisions made, outcomes observed. Gives agents a history they can learn from.</div>
+        <div class="mem-badge" style="background:#fae8ff;color:#7e22ce">Persistent · grows</div>
+      </div>
+      <div class="mem-card" style="background:#ecfdf5;border-color:#34d399">
+        <div class="mem-dot" style="background:#34d399"></div>
+        <div class="mem-title" style="color:#065f46">Semantic memory</div>
+        <div class="mem-sub" style="color:#047857">Facts, domain knowledge, learned truths about the world. Shared across agents. The organization's collective intelligence.</div>
+        <div class="mem-badge" style="background:#d1fae5;color:#065f46">Shared · knowledge base</div>
+      </div>
+      <div class="mem-card" style="background:#eff6ff;border-color:#60a5fa">
+        <div class="mem-dot" style="background:#60a5fa"></div>
+        <div class="mem-title" style="color:#1e40af">Procedural memory</div>
+        <div class="mem-sub" style="color:#1d4ed8">How to do things. Learned workflows, tool-use patterns, successful strategies. Gets better with use.</div>
+        <div class="mem-badge" style="background:#dbeafe;color:#1e40af">Behavioral · improves</div>
+      </div>
+    </div>
+
+    <div class="sec-label">Memory consolidation pipeline</div>
+    <div class="pipeline">
+      <div class="pipe-node">
+        <div class="pn-title">Raw interaction</div>
+        <div class="pn-sub">Tool calls · outputs</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node">
+        <div class="pn-title">Extraction</div>
+        <div class="pn-sub">Pull facts · patterns</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node">
+        <div class="pn-title">Consolidation</div>
+        <div class="pn-sub">Merge with memory store</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node">
+        <div class="pn-title">Vector index</div>
+        <div class="pn-sub">Semantic retrieval</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node highlight">
+        <div class="pn-title">Agent context</div>
+        <div class="pn-sub">Injected next session</div>
+      </div>
+    </div>
+
+    <div class="never-defer">
+      <span class="nd-pill">Never defer</span>
+      <span class="nd-text">Identity and memory are the only two layers where deferral has no recovery path. Build them right in month one, or rebuild everything in month twelve.</span>
+    </div>
+
+    <div class="callout callout-purple">
+      <div class="callout-accent"></div>
+      <div>
+        <div class="callout-title">The inversion principle</div>
+        <div class="callout-body">Every other framework puts applications at the top and identity/memory at the bottom as an afterthought. This architecture inverts that. Identity and memory aren't features — they're the substrate. Everything above them inherits their properties. Get this wrong and no amount of clever tooling above it will save you.</div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span class="footer-label">Layer 01 · Identity &amp; Memory Foundation</span>
+    <button class="btn-primary" onclick="showPage('layer2')">Next: Data &amp; Infrastructure →</button>
+  </div>
+</div>
+
+<!-- ============================================================ LAYER 2: DATA ============================================================ -->
+<div id="page-layer2" class="page">
+  <div class="hero" style="background:linear-gradient(135deg,#fff7ed,#fef3c7)">
+    <div class="breadcrumb">Overview <span>/ Layer 02</span></div>
+    <div class="hero-kicker" style="color:#c2410c">Layer 02 · Infrastructure</div>
+    <h1 style="color:#7c2d12">Data &amp; <span style="color:#c2410c">Infrastructure</span></h1>
+    <p class="hero-sub">Data as a participant, not a record. The engine room that powers real-time agent decisions, model hosting, and continuous learning at enterprise scale.</p>
+  </div>
+
+  <div class="content">
+    <button class="back-btn" onclick="showPage('home')">← Back to overview</button>
+
+    <div class="sec-label">The shift in how data works</div>
+    <div class="callout callout-orange">
+      <div class="callout-accent"></div>
+      <div>
+        <div class="callout-title">Data as participant</div>
+        <div class="callout-body">Traditional architectures treat data as a record — something you write, store, and query. Agentic systems need data to be a participant — something that flows, transforms, enriches decisions in real time, and feeds back into the agents that created it. That requires a fundamentally different infrastructure philosophy.</div>
+      </div>
+    </div>
+
+    <div class="sec-label">Core infrastructure components</div>
+    <div class="detail-grid">
+      <div class="detail-card" style="background:#fff7ed;border-color:#fb923c">
+        <div class="dc-title" style="color:#c2410c">Medallion architecture</div>
+        <div class="dc-body" style="color:#9a3412">Bronze → Silver → Gold data layers. Raw ingestion, cleaned/structured, business-ready. Agents work at the Gold layer but the pipeline runs continuously. Unstructured data governed at every stage — not just at the end.</div>
+        <div class="dc-tags"><span class="dc-tag" style="background:#ffedd5;color:#9a3412">Bronze · Silver · Gold</span></div>
+      </div>
+      <div class="detail-card" style="background:#ecfdf5;border-color:#34d399">
+        <div class="dc-title" style="color:#065f46">Vector &amp; semantic stores</div>
+        <div class="dc-body" style="color:#047857">Embeddings of documents, agent memories, and domain knowledge. Agents retrieve context by meaning, not keyword. The infrastructure that makes semantic memory possible at scale.</div>
+        <div class="dc-tags"><span class="dc-tag" style="background:#d1fae5;color:#065f46">Embeddings</span><span class="dc-tag" style="background:#d1fae5;color:#065f46">Semantic search</span></div>
+      </div>
+      <div class="detail-card" style="background:#eff6ff;border-color:#60a5fa">
+        <div class="dc-title" style="color:#1e40af">Streaming fabric</div>
+        <div class="dc-body" style="color:#1d4ed8">Kafka-based real-time event streams. Agents don't poll — they subscribe. Changes in Salesforce, ServiceNow, or any connected system surface as events the agent fabric can act on immediately.</div>
+        <div class="dc-tags"><span class="dc-tag" style="background:#dbeafe;color:#1e40af">Kafka</span><span class="dc-tag" style="background:#dbeafe;color:#1e40af">Event-driven</span></div>
+      </div>
+      <div class="detail-card" style="background:#f0fdf4;border-color:#4ade80">
+        <div class="dc-title" style="color:#15803d">MLOps &amp; model registry</div>
+        <div class="dc-body" style="color:#166534">Model versioning, deployment, monitoring, and retraining pipelines. Agents can use the right model for the right task — and as models improve, the platform improves without architectural changes.</div>
+        <div class="dc-tags"><span class="dc-tag" style="background:#dcfce7;color:#166534">Model versioning</span><span class="dc-tag" style="background:#dcfce7;color:#166534">Auto-retrain</span></div>
+      </div>
+    </div>
+
+    <div class="callout callout-orange">
+      <div class="callout-accent"></div>
+      <div>
+        <div class="callout-title">Legacy integration reality</div>
+        <div class="callout-body">Most enterprises have mainframes, ERP systems, and databases that aren't going anywhere. The streaming fabric handles this through Kafka-based ingestion — legacy systems emit events or get CDC (change data capture) wrappers. The agentic layer never knows a mainframe exists. It just sees a stream.</div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span class="footer-label">Layer 02 · Data &amp; Infrastructure</span>
+    <button class="btn-primary" onclick="showPage('layer3')">Next: A2A Coordination →</button>
+  </div>
+</div>
+
+<!-- ============================================================ LAYER 3: A2A ============================================================ -->
+<div id="page-layer3" class="page">
+  <div class="hero" style="background:linear-gradient(135deg,#f0fdfa,#ecfdf5)">
+    <div class="breadcrumb">Overview <span>/ Layer 03</span></div>
+    <div class="hero-kicker" style="color:#047857">Layer 03 · Nervous System</div>
+    <h1 style="color:#134e4a">A2A Communication<br><span style="color:#0f766e">&amp; Coordination</span></h1>
+    <p class="hero-sub">Not a gateway — the nervous system of the platform. This is where agents stop being isolated tools and start being a coordinated fabric that routes work intelligently across your enterprise.</p>
+  </div>
+
+  <div class="content">
+    <button class="back-btn" onclick="showPage('home')">← Back to overview</button>
+
+    <div class="a2a-banner">
+      <span class="a2a-pill">First-class layer</span>
+      <span class="a2a-text">A2A communication has its own governance lane, identity model, and routing fabric. It's not tucked into the "interfaces" row alongside an API gateway. It's architecturally distinct because the problems it solves are architecturally distinct.</span>
+    </div>
+
+    <div class="sec-label">How A2A coordination works</div>
+    <div class="flow-diagram">
+      <div class="flow-row">
+        <div class="flow-node fn-purple">
+          <strong>Orchestrator agent</strong>
+          <span>Plans · decomposes task</span>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-label">delegates subtask</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node fn-teal">
+          <strong>Specialist agent</strong>
+          <span>Executes · returns result</span>
+        </div>
+      </div>
+      <div class="flow-row" style="margin-top:4px">
+        <div class="flow-node fn-blue">
+          <strong>Salesforce agent</strong>
+          <span>CRM data · actions</span>
+        </div>
+        <div class="flow-arrow">↔</div>
+        <div class="flow-node fn-orange">
+          <strong>ServiceNow agent</strong>
+          <span>Tickets · workflows</span>
+        </div>
+        <div class="flow-arrow">↔</div>
+        <div class="flow-node fn-teal">
+          <strong>Databricks agent</strong>
+          <span>Analytics · ML results</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-label">Core A2A components</div>
+    <div class="detail-grid">
+      <div class="detail-card" style="background:#f0fdfa;border-color:#34d399">
+        <div class="dc-title" style="color:#065f46">MCP protocol layer</div>
+        <div class="dc-body" style="color:#047857">Model Context Protocol gives agents a standardized way to discover and call tools — including other agents. One protocol, every platform. No custom integration code per system.</div>
+        <div class="dc-tags"><span class="dc-tag" style="background:#d1fae5;color:#065f46">Standardized</span><span class="dc-tag" style="background:#d1fae5;color:#065f46">Tool discovery</span></div>
+      </div>
+      <div class="detail-card" style="background:#faf5ff;border-color:#c084fc">
+        <div class="dc-title" style="color:#6d28d9">Agent-to-agent bus</div>
+        <div class="dc-body" style="color:#5b21b6">The message fabric connecting agents. Routes task delegations, result returns, and status updates between agents with delivery guarantees, backpressure handling, and dead-letter queues.</div>
+        <div class="dc-tags"><span class="dc-tag" style="background:#ede9fe;color:#5b21b6">Async routing</span><span class="dc-tag" style="background:#ede9fe;color:#5b21b6">Guaranteed delivery</span></div>
+      </div>
+      <div class="detail-card" style="background:#eff6ff;border-color:#60a5fa">
+        <div class="dc-title" style="color:#1e40af">Task delegation router</div>
+        <div class="dc-body" style="color:#1d4ed8">When an orchestrator breaks a complex task into subtasks, the router finds the right specialist agent for each. Routing decisions are based on agent capability registrations — not hardcoded rules.</div>
+        <div class="dc-tags"><span class="dc-tag" style="background:#dbeafe;color:#1e40af">Capability-based</span><span class="dc-tag" style="background:#dbeafe;color:#1e40af">Dynamic routing</span></div>
+      </div>
+      <div class="detail-card" style="background:#fff7ed;border-color:#fb923c">
+        <div class="dc-title" style="color:#c2410c">Cross-platform connectors</div>
+        <div class="dc-body" style="color:#9a3412">Pre-built MCP connectors for Salesforce, ServiceNow, Databricks, Teams, Jira, and legacy systems. Agents see a unified tool surface — the connector handles translation to each platform's native API.</div>
+        <div class="dc-tags"><span class="dc-tag" style="background:#ffedd5;color:#9a3412">Pre-built</span><span class="dc-tag" style="background:#ffedd5;color:#9a3412">Unified surface</span></div>
+      </div>
+    </div>
+
+    <div class="callout callout-teal">
+      <div class="callout-accent"></div>
+      <div>
+        <div class="callout-title">Why A2A trust matters more than you think</div>
+        <div class="callout-body">The moment Agent A can call Agent B, you have a distributed trust problem. If Agent A can impersonate Agent B — or if a malicious prompt can hijack an agent into calling tools it shouldn't — your entire fabric is compromised. A2A trust credentials (from Layer 01) are what make this safe. Every cross-agent call requires mutual authentication. No exceptions.</div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px">
+      <button class="btn-primary" onclick="showPage('salesforce')">See Salesforce + MCP deep dive →</button>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span class="footer-label">Layer 03 · A2A Communication &amp; Coordination</span>
+    <button class="btn-primary" onclick="showPage('layer4')">Next: Agentic Runtimes →</button>
+  </div>
+</div>
+
+<!-- ============================================================ LAYER 4: RUNTIMES ============================================================ -->
+<div id="page-layer4" class="page">
+  <div class="hero" style="background:linear-gradient(135deg,#eff6ff,#e0f2fe)">
+    <div class="breadcrumb">Overview <span>/ Layer 04</span></div>
+    <div class="hero-kicker" style="color:#1d4ed8">Layer 04 · Execution</div>
+    <h1 style="color:#1e3a8a">Agentic <span style="color:#1d4ed8">Runtimes</span></h1>
+    <p class="hero-sub">Where agents actually execute. This layer is where reasoning meets action — tool discovery, orchestration, evaluation loops, and observability all converge here.</p>
+  </div>
+
+  <div class="content">
+    <button class="back-btn" onclick="showPage('home')">← Back to overview</button>
+
+    <div class="sec-label">Runtime components</div>
+    <div class="detail-grid">
+      <div class="detail-card" style="background:#eff6ff;border-color:#60a5fa">
+        <div class="dc-title" style="color:#1e40af">Tool registry &amp; discovery</div>
+        <div class="dc-body" style="color:#1d4ed8">Agents don't have hardcoded tool lists. They query the registry at runtime: "what can I do right now?" The registry reflects current permissions, available connectors, and platform health — dynamically.</div>
+        <div class="dc-tags"><span class="dc-tag" style="background:#dbeafe;color:#1e40af">Dynamic</span><span class="dc-tag" style="background:#dbeafe;color:#1e40af">Permission-aware</span></div>
+      </div>
+      <div class="detail-card" style="background:#faf5ff;border-color:#c084fc">
+        <div class="dc-title" style="color:#6d28d9">Workflow orchestration</div>
+        <div class="dc-body" style="color:#5b21b6">Multi-step agent workflows with branching, parallelism, and error recovery. The orchestrator coordinates without micromanaging — agents retain autonomy within defined bounds.</div>
+        <div class="dc-tags"><span class="dc-tag" style="background:#ede9fe;color:#5b21b6">Parallel execution</span><span class="dc-tag" style="background:#ede9fe;color:#5b21b6">Error recovery</span></div>
+      </div>
+      <div class="detail-card" style="background:#ecfdf5;border-color:#34d399">
+        <div class="dc-title" style="color:#065f46">Evaluations engine</div>
+        <div class="dc-body" style="color:#047857">Continuous evaluation of agent outputs against defined criteria — accuracy, safety, alignment with intent. Not a one-time test suite. A live feedback loop that surfaces drift before users notice it.</div>
+        <div class="dc-tags"><span class="dc-tag" style="background:#d1fae5;color:#065f46">Continuous</span><span class="dc-tag" style="background:#d1fae5;color:#065f46">Drift detection</span></div>
+      </div>
+      <div class="detail-card" style="background:#fff7ed;border-color:#fb923c">
+        <div class="dc-title" style="color:#c2410c">Observability &amp; tracing</div>
+        <div class="dc-body" style="color:#9a3412">Full distributed tracing across agent calls, tool invocations, and A2A delegations. When something goes wrong — and it will — you need a complete causal chain, not a log file.</div>
+        <div class="dc-tags"><span class="dc-tag" style="background:#ffedd5;color:#9a3412">Distributed trace</span><span class="dc-tag" style="background:#ffedd5;color:#9a3412">Causal chain</span></div>
+      </div>
+    </div>
+
+    <div class="callout callout-purple">
+      <div class="callout-accent"></div>
+      <div>
+        <div class="callout-title">Built in, not bolted on</div>
+        <div class="callout-body">The worst pattern in enterprise AI deployments is treating observability and evaluation as something you add after things break. By then, you don't know what broke or why. These capabilities need to be part of the runtime contract from day one — every agent execution emits traces, every output runs through evaluation, every tool call is logged to the audit trail from Layer 01.</div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span class="footer-label">Layer 04 · Agentic Runtimes</span>
+    <button class="btn-primary" onclick="showPage('layer5')">Next: Agentic Systems →</button>
+  </div>
+</div>
+
+<!-- ============================================================ LAYER 5: SYSTEMS ============================================================ -->
+<div id="page-layer5" class="page">
+  <div class="hero" style="background:linear-gradient(135deg,#f5f3ff,#ede9fe)">
+    <div class="breadcrumb">Overview <span>/ Layer 05</span></div>
+    <div class="hero-kicker" style="color:#6d28d9">Layer 05 · Application</div>
+    <h1 style="color:#4c1d95">Agentic <span style="color:#6d28d9">Systems</span></h1>
+    <p class="hero-sub">The layer your users actually interact with. Four distinct system types — each suited to a different problem class. Choosing the wrong type for the job is one of the most common deployment mistakes.</p>
+  </div>
+
+  <div class="content">
+    <button class="back-btn" onclick="showPage('home')">← Back to overview</button>
+
+    <div class="sec-label">Four system types</div>
+    <div class="detail-grid">
+      <div class="detail-card" style="background:#eff6ff;border-color:#60a5fa">
+        <div class="dc-title" style="color:#1e40af">Enterprise productivity agents</div>
+        <div class="dc-body" style="color:#1d4ed8">Horizontal agents that bring AI interfaces and workflow automation to the broader organization. Low-code surfaces, broad utility. Think: summarization, drafting, data lookup across systems. High volume, moderate complexity.</div>
+        <div class="dc-tags"><span class="dc-tag" style="background:#dbeafe;color:#1e40af">Broad utility</span><span class="dc-tag" style="background:#dbeafe;color:#1e40af">High volume</span></div>
+      </div>
+      <div class="detail-card" style="background:#fdf4ff;border-color:#d946ef">
+        <div class="dc-title" style="color:#7e22ce">Highly custom agents</div>
+        <div class="dc-body" style="color:#6b21a8">Built on lower-level frameworks for developers who need full control. These agents solve the most complex problems — ones where pre-built solutions break. High capability ceiling, high investment.</div>
+        <div class="dc-tags"><span class="dc-tag" style="background:#fae8ff;color:#7e22ce">Full control</span><span class="dc-tag" style="background:#fae8ff;color:#7e22ce">Complex problems</span></div>
+      </div>
+      <div class="detail-card" style="background:#ecfdf5;border-color:#34d399">
+        <div class="dc-title" style="color:#065f46">Purpose-fit agents</div>
+        <div class="dc-body" style="color:#047857">Pre-built agents with light integration, tailored to a specific domain. Think: a legal review agent, a procurement agent, a claims processing agent. Best-in-class for their domain, limited outside it.</div>
+        <div class="dc-tags"><span class="dc-tag" style="background:#d1fae5;color:#065f46">Domain-specific</span><span class="dc-tag" style="background:#d1fae5;color:#065f46">Fast to deploy</span></div>
+      </div>
+      <div class="detail-card" style="background:#fff7ed;border-color:#fb923c">
+        <div class="dc-title" style="color:#c2410c">Workflow automation agents</div>
+        <div class="dc-body" style="color:#9a3412">Process-focused agents that handle defined workflows with minimal human intervention. The AI is optional — these can run without LLMs for deterministic steps and invoke agents only when judgment is needed.</div>
+        <div class="dc-tags"><span class="dc-tag" style="background:#ffedd5;color:#9a3412">Process-driven</span><span class="dc-tag" style="background:#ffedd5;color:#9a3412">Selective AI</span></div>
+      </div>
+    </div>
+
+    <div class="callout callout-purple">
+      <div class="callout-accent"></div>
+      <div>
+        <div class="callout-title">The deployment mistake everyone makes</div>
+        <div class="callout-body">Organizations reach for highly custom agents when purpose-fit agents would work fine — burning 6 months of engineering on problems that are already solved. The inverse also happens: deploying a purpose-fit agent for a genuinely novel problem and watching it fail at the edges. Match the system type to the problem class before you write a line of code.</div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span class="footer-label">Layer 05 · Agentic Systems</span>
+    <button class="btn-primary" onclick="showPage('layer6')">Next: Governance &amp; Trust →</button>
+  </div>
+</div>
+
+<!-- ============================================================ LAYER 6: GOVERNANCE ============================================================ -->
+<div id="page-layer6" class="page">
+  <div class="hero" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7)">
+    <div class="breadcrumb">Overview <span>/ Layer 06</span></div>
+    <div class="hero-kicker" style="color:#15803d">Layer 06 · Trust</div>
+    <h1 style="color:#14532d">Governance <span style="color:#15803d">&amp; Trust</span></h1>
+    <p class="hero-sub">Trust is architectural. The single most important idea in this framework. Governance that lives outside your architecture is decoration. Governance that lives inside it is infrastructure.</p>
+  </div>
+
+  <div class="content">
+    <button class="back-btn" onclick="showPage('home')">← Back to overview</button>
+
+    <div class="callout callout-teal">
+      <div class="callout-accent"></div>
+      <div>
+        <div class="callout-title">The embedded governance principle</div>
+        <div class="callout-body">Most organizations treat AI governance as a review process — a committee that audits outputs after the fact. That's compliance theater. Real governance means controls are enforced at the point of action: inside the runtime, inside the identity model, inside the A2A protocol. You can't govern what you can't intercept.</div>
+      </div>
+    </div>
+
+    <div class="sec-label">Governance dimensions</div>
+    <div class="detail-grid">
+      <div class="detail-card" style="background:#f0fdf4;border-color:#4ade80">
+        <div class="dc-title" style="color:#15803d">Regulatory compliance</div>
+        <div class="dc-body" style="color:#166534">FedRAMP, FISMA, SOC2, GDPR — compliance controls mapped at the layer where data is created, not just at the perimeter where it exits. ATO pathways built into the architecture, not retrofitted before an audit.</div>
+        <div class="dc-tags"><span class="dc-tag" style="background:#dcfce7;color:#166534">FedRAMP</span><span class="dc-tag" style="background:#dcfce7;color:#166534">FISMA</span><span class="dc-tag" style="background:#dcfce7;color:#166534">SOC2</span></div>
+      </div>
+      <div class="detail-card" style="background:#eff6ff;border-color:#60a5fa">
+        <div class="dc-title" style="color:#1e40af">Data privacy</div>
+        <div class="dc-body" style="color:#1d4ed8">PII detection, data residency enforcement, access scoping per agent identity. An agent processing a customer record can only see what its identity permits. Enforced by Layer 01, not by policy documents.</div>
+        <div class="dc-tags"><span class="dc-tag" style="background:#dbeafe;color:#1e40af">PII detection</span><span class="dc-tag" style="background:#dbeafe;color:#1e40af">Residency control</span></div>
+      </div>
+      <div class="detail-card" style="background:#faf5ff;border-color:#c084fc">
+        <div class="dc-title" style="color:#6d28d9">Responsible AI controls</div>
+        <div class="dc-body" style="color:#5b21b6">Evaluation loops that check agent outputs for bias, harm, and alignment with intent before they reach users or trigger downstream actions. Not a human reviewer — an automated guardian that scales with the system.</div>
+        <div class="dc-tags"><span class="dc-tag" style="background:#ede9fe;color:#5b21b6">Bias detection</span><span class="dc-tag" style="background:#ede9fe;color:#5b21b6">Output guards</span></div>
+      </div>
+      <div class="detail-card" style="background:#fef3c7;border-color:#f59e0b">
+        <div class="dc-title" style="color:#92400e">Human oversight hooks</div>
+        <div class="dc-body" style="color:#78350f">Defined escalation points where agent autonomy pauses and human judgment enters. Not a failure mode — a design choice. High-stakes decisions (financial, legal, medical) get a human in the loop by architecture, not by accident.</div>
+        <div class="dc-tags"><span class="dc-tag" style="background:#fef3c7;color:#92400e">Escalation rules</span><span class="dc-tag" style="background:#fef3c7;color:#92400e">Audit checkpoint</span></div>
+      </div>
+    </div>
+
+    <div class="callout callout-teal">
+      <div class="callout-accent"></div>
+      <div>
+        <div class="callout-title">Value assurance</div>
+        <div class="callout-body">The final governance dimension — and the most underrated. Value assurance is continuous monitoring that agent behavior matches original intent over time. Models drift. Prompts shift. Connected systems change. Value assurance surfaces misalignment before it becomes a business problem, feeding corrective signals back to Layer 04 (the evaluation engine) in real time.</div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span class="footer-label">Layer 06 · Governance &amp; Trust</span>
+    <button class="btn-primary" onclick="showPage('home')">← Back to overview</button>
+  </div>
+</div>
+
+<!-- ============================================================ SALESFORCE + MCP ============================================================ -->
+<div id="page-salesforce" class="page">
+  <div class="hero" style="background:linear-gradient(135deg,#e0f2fe,#dbeafe)">
+    <div class="breadcrumb">Overview <span>/ Salesforce + MCP</span></div>
+    <div class="hero-kicker" style="color:#0284c7">Deep Dive · Platform Integration</div>
+    <h1 style="color:#1e3a8a">Salesforce <span style="color:#0284c7">+ MCP</span></h1>
+    <p class="hero-sub">How an enterprise CRM becomes a first-class node in your agentic fabric — discoverable, callable, and composable with every other platform on the bus.</p>
+  </div>
+
+  <div class="content">
+    <button class="back-btn" onclick="showPage('home')">← Back to overview</button>
+
+    <div class="sec-label">The three-step MCP pattern</div>
+    <div class="flow-diagram">
+      <div class="flow-row">
+        <div class="flow-node fn-purple">
+          <strong>Agent orchestrator</strong>
+          <span>Reasons · plans · routes</span>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-label">1 · discover</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node fn-teal">
+          <strong>Salesforce MCP server</strong>
+          <span>Returns tool manifest</span>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-label">tool manifest</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node fn-blue">
+          <strong>Salesforce CRM</strong>
+          <span>Data · actions · flows</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-label">Tools exposed via MCP</div>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon" style="background:#dbeafe"><span style="font-weight:800;color:#1d4ed8;font-size:13px">QR</span></div>
+        <div class="card-title">query_records</div>
+        <div class="card-body">Natural language to SOQL. Agents query accounts, contacts, opportunities, cases — without knowing Salesforce's data model.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="background:#fce7f3"><span style="font-weight:800;color:#be185d;font-size:13px">CC</span></div>
+        <div class="card-title">create_case</div>
+        <div class="card-body">Open a support case with full context from the agent's working memory. Service Cloud integration out of the box.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="background:#ecfdf5"><span style="font-weight:800;color:#047857;font-size:13px">UO</span></div>
+        <div class="card-title">update_opportunity</div>
+        <div class="card-body">Move deals through pipeline stages, update amounts, attach meeting notes — all from agent context, no UI required.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="background:#fef3c7"><span style="font-weight:800;color:#92400e;font-size:13px">TF</span></div>
+        <div class="card-title">trigger_flow</div>
+        <div class="card-body">Fire any Salesforce automation flow from an agent action. The full power of Flow Builder, accessible to any MCP client.</div>
+      </div>
+    </div>
+
+    <div class="sec-label">Why the orchestrator doesn't know it's Salesforce</div>
+    <div class="callout callout-teal">
+      <div class="callout-accent"></div>
+      <div>
+        <div class="callout-title">The abstraction that matters</div>
+        <div class="callout-body">The orchestrating agent never imports a Salesforce SDK or knows anything about SOQL, Apex, or the Salesforce data model. It just knows how to talk MCP. Swap Salesforce for ServiceNow, Jira, or a legacy mainframe — same agent, same protocol, different tools in the manifest. This is what makes the platform genuinely composable rather than just "integrated."</div>
+      </div>
+    </div>
+
+    <div class="sec-label">Where results go after Salesforce</div>
+    <div class="pipeline">
+      <div class="pipe-node fn-blue" style="background:#eff6ff;border:1.5px solid #60a5fa">
+        <div class="pn-title" style="color:#1d4ed8">Salesforce result</div>
+        <div class="pn-sub">Structured data returned</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node">
+        <div class="pn-title">Agent reasoning</div>
+        <div class="pn-sub">Interprets · decides</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node">
+        <div class="pn-title">A2A bus</div>
+        <div class="pn-sub">Routes to next agent</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node">
+        <div class="pn-title">ServiceNow agent</div>
+        <div class="pn-sub">Opens related ticket</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-node highlight">
+        <div class="pn-title">Teams notification</div>
+        <div class="pn-sub">Human informed</div>
+      </div>
+    </div>
+
+    <div class="callout callout-purple">
+      <div class="callout-accent"></div>
+      <div>
+        <div class="callout-title">Salesforce isn't a destination. It's a node.</div>
+        <div class="callout-body">The real enterprise value isn't "agents can query Salesforce." It's that a Salesforce query result can automatically trigger a ServiceNow ticket, update a Databricks pipeline, notify a Teams channel, and update a Jira epic — all without a human routing anything. That's the A2A layer doing its job, with Salesforce as one node in an intelligent fabric.</div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span class="footer-label">Salesforce + MCP Deep Dive</span>
+    <button class="btn-primary" onclick="showPage('layer3')">← Back to A2A layer</button>
+  </div>
+</div>
+
+<script>
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const page = document.getElementById('page-' + id);
+  if (page) {
+    page.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  const map = { home: 0, layer1: 1, layer2: 2, layer3: 3, layer4: 4, layer5: 5, layer6: 6, salesforce: 7 };
+  const btns = document.querySelectorAll('.nav-btn');
+  if (map[id] !== undefined && btns[map[id]]) btns[map[id]].classList.add('active');
+}
+</script>
+
+
+<div id="hl-aria-live-message-container" aria-live="polite" class="visually-hidden"></div><div id="hl-aria-live-alert-container" role="alert" aria-live="assertive" class="visually-hidden"></div></body></html>
