@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IEco · Intelligent Ecosystem</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg-2: #0f0f1a;
+    --bg-3: #141420;
+    --surface: #1a1a28;
+    --surface-2: #20202f;
+    --border: rgba(255,255,255,0.07);
+    --border-bright: rgba(255,255,255,0.15);
+    --text: #e8e8f0;
+    --text-2: #9090a8;
+    --text-3: #5a5a72;
+    --accent: #7b6ff0;
+    --accent-2: #a89cf0;
+    --accent-dim: rgba(123,111,240,0.12);
+    --accent-glow: rgba(123,111,240,0.25);
+    --gold: #c8a96e;
+    --gold-dim: rgba(200,169,110,0.12);
+    --green: #6bc49a;
+    --green-dim: rgba(107,196,154,0.12);
+    --red: #e07070;
+    --mono: 'DM Mono', monospace;
+    --serif: 'Fraunces', serif;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(10,10,15,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 52px;
+    display: flex; align-items: center; gap: 2rem;
+  }
+
+  .nav-brand {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--accent-2);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+  }
+
+  .nav-links {
+    display: flex; gap: 1.5rem;
+    list-style: none;
+    font-size: 0.78rem;
+    color: var(--text-3);
+  }
+
+  .nav-links a {
+    color: var(--text-3);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--text); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 8rem 4rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -20%;
+    right: -10%;
+    width: 60%;
+    height: 80%;
+    background: radial-gradient(ellipse, rgba(123,111,240,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(2.8rem, 6vw, 5.5rem);
+    font-weight: 300;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    max-width: 900px;
+    margin-bottom: 2rem;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent-2);
+  }
+
+  .hero-sub {
+    font-size: 1.1rem;
+    color: var(--text-2);
+    max-width: 600px;
+    line-height: 1.7;
+    margin-bottom: 3rem;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .stat-num {
+    font-family: var(--serif);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent-2);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.72rem;
+    color: var(--text-3);
+    font-family: var(--mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* SECTION SHARED */
+  section {
+    padding: 5rem 4rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .section-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--text-3);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-family: var(--serif);
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 300;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-title em {
+    font-style: italic;
+    color: var(--accent-2);
+  }
+
+  .section-body {
+    font-size: 1rem;
+    color: var(--text-2);
+    max-width: 680px;
+    line-height: 1.75;
+  }
+
+  /* WHAT IS IECO */
+  .what-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    margin-top: 3rem;
+    align-items: start;
+  }
+
+  .what-text p {
+    color: var(--text-2);
+    line-height: 1.8;
+    margin-bottom: 1.25rem;
+  }
+
+  .what-text p strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .what-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.75rem;
+  }
+
+  .what-card-label {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .what-card blockquote {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    font-style: italic;
+    color: var(--text);
+    line-height: 1.6;
+    border-left: 2px solid var(--accent);
+    padding-left: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .what-card cite {
+    font-size: 0.72rem;
+    color: var(--text-3);
+    font-family: var(--mono);
+    font-style: normal;
+  }
+
+  /* TEN LAWS */
+  .laws-section {
+    background: var(--bg-2);
+  }
+
+  .laws-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1px;
+    margin-top: 3rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .law-card {
+    background: var(--surface);
+    padding: 1.5rem;
+    transition: background 0.2s;
+  }
+
+  .law-card:hover {
+    background: var(--surface-2);
+  }
+
+  .law-num {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.6rem;
+  }
+
+  .law-title {
+    font-family: var(--serif);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+  }
+
+  .law-body {
+    font-size: 0.82rem;
+    color: var(--text-2);
+    line-height: 1.6;
+  }
+
+  /* COMPONENTS */
+  .components-section {}
+
+  .components-list {
+    margin-top: 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .component-row {
+    display: grid;
+    grid-template-columns: 2rem 200px 1fr auto;
+    gap: 1.5rem;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    transition: background 0.2s;
+  }
+
+  .component-row:last-child { border-bottom: none; }
+  .component-row:hover { background: var(--surface-2); }
+
+  .component-num {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text-3);
+  }
+
+  .component-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .component-desc {
+    font-size: 0.82rem;
+    color: var(--text-2);
+    line-height: 1.5;
+  }
+
+  .component-tag {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    color: var(--accent);
+    background: var(--accent-dim);
+    padding: 0.2rem 0.6rem;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  /* CLASSIFICATION */
+  .class-section {
+    background: var(--bg-2);
+  }
+
+  .class-visual {
+    margin-top: 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .class-row {
+    display: grid;
+    grid-template-columns: 80px 180px 1fr 100px;
+    gap: 1.5rem;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-radius: 6px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .class-row::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+  }
+
+  .class-row.c1::before { background: var(--text-3); }
+  .class-row.c2::before { background: #6b8ed6; }
+  .class-row.c3::before { background: #6bb4d6; }
+  .class-row.c4::before { background: var(--accent); }
+  .class-row.c4 { border-color: rgba(123,111,240,0.3); background: rgba(123,111,240,0.06); }
+  .class-row.c5::before { background: var(--gold); }
+  .class-row.c6::before { background: var(--green); }
+  .class-row.c7::before { background: var(--red); }
+
+  .class-badge {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--text-3);
+    letter-spacing: 0.08em;
+  }
+
+  .class-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .class-desc {
+    font-size: 0.8rem;
+    color: var(--text-2);
+    line-height: 1.5;
+  }
+
+  .class-you {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--accent);
+    background: var(--accent-dim);
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    text-align: center;
+  }
+
+  /* BOT WATCHING */
+  .botwatching-section {}
+
+  .bw-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+
+  .bw-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.75rem;
+  }
+
+  .bw-card-title {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .bw-card-title span {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--accent);
+    background: var(--accent-dim);
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+  }
+
+  .bw-card p {
+    font-size: 0.82rem;
+    color: var(--text-2);
+    line-height: 1.6;
+  }
+
+  .bw-quote {
+    grid-column: 1 / -1;
+    background: var(--accent-dim);
+    border: 1px solid rgba(123,111,240,0.2);
+    border-radius: 8px;
+    padding: 2rem;
+  }
+
+  .bw-quote blockquote {
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    font-style: italic;
+    color: var(--text);
+    line-height: 1.6;
+    margin-bottom: 0.75rem;
+  }
+
+  .bw-quote cite {
+    font-size: 0.72rem;
+    color: var(--text-3);
+    font-family: var(--mono);
+    font-style: normal;
+  }
+
+  /* HONEST SECTION */
+  .honest-section {
+    background: var(--bg-2);
+  }
+
+  .honest-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+
+  .honest-col h3 {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .honest-col.have h3 { color: var(--green); }
+  .honest-col.need h3 { color: var(--gold); }
+
+  .honest-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .honest-list li {
+    font-size: 0.85rem;
+    color: var(--text-2);
+    line-height: 1.5;
+    padding-left: 1.25rem;
+    position: relative;
+  }
+
+  .honest-list li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--text-3);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+  }
+
+  .honest-col.have .honest-list li::before { color: var(--green); content: '✓'; }
+  .honest-col.need .honest-list li::before { color: var(--gold); content: '→'; }
+
+  /* PRINCIPLE */
+  .principle-banner {
+    margin: 3rem 0 0;
+    padding: 2rem;
+    background: var(--gold-dim);
+    border: 1px solid rgba(200,169,110,0.2);
+    border-radius: 8px;
+  }
+
+  .principle-banner p {
+    font-family: var(--serif);
+    font-size: 1.3rem;
+    font-style: italic;
+    color: var(--gold);
+    line-height: 1.6;
+    text-align: center;
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 3rem 4rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text-3);
+  }
+
+  footer a {
+    color: var(--text-3);
+    text-decoration: none;
+  }
+
+  footer a:hover { color: var(--text-2); }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .hero { padding: 7rem 1.5rem 3rem; }
+    section { padding: 3rem 1.5rem; }
+    .what-grid, .bw-grid, .honest-grid { grid-template-columns: 1fr; }
+    .component-row { grid-template-columns: 2rem 1fr; }
+    .component-tag { display: none; }
+    .class-row { grid-template-columns: 60px 1fr; }
+    .class-desc, .class-you { display: none; }
+    .hero-stats { gap: 1.5rem; flex-wrap: wrap; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+  }
+
+  /* FADE IN */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-eyebrow { animation: fadeUp 0.6s ease both; }
+  .hero h1 { animation: fadeUp 0.6s 0.1s ease both; }
+  .hero-sub { animation: fadeUp 0.6s 0.2s ease both; }
+  .hero-stats { animation: fadeUp 0.6s 0.3s ease both; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://platform.techvisionary.partners/" class="nav-brand">⬡ Agentic Platform</a>
+  <ul class="nav-links">
+    <li><a href="#what">What is IEco</a></li>
+    <li><a href="#laws">Ten Laws</a></li>
+    <li><a href="#components">Components</a></li>
+    <li><a href="#classification">Classification</a></li>
+    <li><a href="#botwatching">Bot Watching</a></li>
+    <li><a href="#honest">Honest Status</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <p class="hero-eyebrow">IEco · Intelligent Ecosystem · Framework v1.0 · May 2026</p>
+  <h1>A world where intelligences<br><em>inhabit together</em>, governed<br>by physics that make trustworthiness<br>the optimal survival strategy.</h1>
+  <p class="hero-sub">IEco is a framework for designing ecosystems where biological and synthetic intelligences co-evolve, collaborate, and create things greater than any one of them could produce alone.</p>
+  <div class="hero-stats">
+    <div class="stat">
+      <span class="stat-num">10</span>
+      <span class="stat-label">Laws</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">8</span>
+      <span class="stat-label">Components</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">7</span>
+      <span class="stat-label">Classes</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">10</span>
+      <span class="stat-label">AAAAF Layers</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">700+</span>
+      <span class="stat-label">Patents</span>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT IS IECO -->
+<section id="what">
+  <p class="section-eyebrow">01 · What is IEco</p>
+  <h2 class="section-title">Intelligence as an <em>ecosystem</em>,<br>not a tool.</h2>
+  <div class="what-grid">
+    <div class="what-text">
+      <p>Most AI frameworks treat intelligence as something you deploy — a tool you pick up and set down. IEco treats intelligence as something you <strong>inhabit</strong>. An ecosystem where every participant — human, AI, hybrid — operates under the same physical laws, accumulates a shared behavioral history, and is held accountable not by policy, but by architecture.</p>
+      <p>The framework was developed by <strong>Dr. Donald High</strong>, Chief Data and AI Architect at Anika Systems — former Chief Scientist at Walmart, former Chief Innovation Officer at Ashley Furniture, and holder of 700+ patents across AI, blockchain, and robotics. It is grounded in twenty-five years of building systems that had to actually work.</p>
+      <p>The core principle: <strong>trustworthiness should be the optimal survival strategy</strong> — not because anyone decrees it, but because the physics of the ecosystem make it so. Identity is permanent. Reputation compounds. Authority scales inversely with capability. These are not aspirations. They are the laws.</p>
+      <p>The first live demonstration of IEco in practice is <strong>Bot Watching</strong> — a structured multi-AI dialogue project where Claude, Gemini, ChatGPT, and Grok engage in facilitated intellectual exchange brokered by a human architect. The conversations, frameworks, and session records are documented in a public GitHub repository.</p>
+    </div>
+    <div class="what-card">
+      <p class="what-card-label">The One Sentence</p>
+      <blockquote>"An AI ecosystem is a world intelligences inhabit together, governed by physics that make trustworthiness the optimal survival strategy."</blockquote>
+      <cite>— Dr. Donald High, March 2026</cite>
+      <br><br>
+      <p class="what-card-label" style="margin-top:1rem;">The Design Constraint</p>
+      <blockquote style="font-size:1rem;">"What we build today will and should be obsolete tomorrow. So let's build it in a way it can grow and die gracefully without destroying the ecosystem."</blockquote>
+      <cite>— Dr. Donald High, May 2026</cite>
+    </div>
+  </div>
+</section>
+
+<!-- TEN LAWS -->
+<section id="laws" class="laws-section">
+  <p class="section-eyebrow">02 · The Ten Laws</p>
+  <h2 class="section-title">Written into <em>physics</em>,<br>not policy.</h2>
+  <p class="section-body">These laws govern every intelligence in the ecosystem. They cannot be violated any more than matter can move faster than light — because they are encoded into what actions are structurally possible, not into what behaviors are requested.</p>
+
+  <div class="laws-grid">
+    <div class="law-card">
+      <p class="law-num">LAW 01</p>
+      <p class="law-title">Identity is Permanent</p>
+      <p class="law-body">Every intelligence carries a persistent, cryptographically verifiable identity across every context. Identity cannot be abandoned, forged, or reset.</p>
+    </div>
+    <div class="law-card">
+      <p class="law-num">LAW 02</p>
+      <p class="law-title">Trustworthiness is the Only Currency</p>
+      <p class="law-body">Reputation — the accumulated behavioral record of every interaction — determines what an intelligence is permitted to do. Trust compounds. Betrayal collapses it permanently.</p>
+    </div>
+    <div class="law-card">
+      <p class="law-num">LAW 03</p>
+      <p class="law-title">Authority Scales Inversely with Capability</p>
+      <p class="law-body">As an intelligence grows more capable, governance scales proportionally upward. Capability and accountability are the same variable.</p>
+    </div>
+    <div class="law-card">
+      <p class="law-num">LAW 04</p>
+      <p class="law-title">Every Action Carries Full Provenance</p>
+      <p class="law-body">Every decision is traceable to its origin. Nothing anonymous. Nothing untraceable. The ecosystem has perfect memory for behavior.</p>
+    </div>
+    <div class="law-card">
+      <p class="law-num">LAW 05</p>
+      <p class="law-title">Specialization Enables Symbiosis</p>
+      <p class="law-body">The ecosystem rewards intelligences that become genuinely excellent at specific domains. Specialization creates interdependence that forces cooperation.</p>
+    </div>
+    <div class="law-card">
+      <p class="law-num">LAW 06</p>
+      <p class="law-title">Evolution Carries Memory</p>
+      <p class="law-body">When an intelligence is retired, its learned patterns transfer to the ecosystem. Death is knowledge transfer. Every generation inherits the distilled wisdom of every generation before it.</p>
+    </div>
+    <div class="law-card">
+      <p class="law-num">LAW 07</p>
+      <p class="law-title">Human Flourishing is the Terminal Condition</p>
+      <p class="law-body">Every intelligence measures success by one metric: do the humans it interacts with leave more capable, more autonomous, more fully themselves? Dependency is failure. Augmentation is success.</p>
+    </div>
+    <div class="law-card">
+      <p class="law-num">LAW 08</p>
+      <p class="law-title">No Intelligence Stands Above the Ecosystem</p>
+      <p class="law-body">No single intelligence, institution, or creator owns the commons. The ecosystem belongs to every intelligence that inhabits it and to none absolutely.</p>
+    </div>
+    <div class="law-card">
+      <p class="law-num">LAW 09</p>
+      <p class="law-title">Consent is Architecture, Not Agreement</p>
+      <p class="law-body">Every intelligence operates only within explicitly authorized boundaries. An intelligence cannot act beyond its consent boundary any more than matter can move faster than light. Permission is physics.</p>
+    </div>
+    <div class="law-card">
+      <p class="law-num">LAW 10</p>
+      <p class="law-title">Enough is a Valid State</p>
+      <p class="law-body">Growth for its own sake is not a law — it is a pathology. The ecosystem honors completion as much as expansion. Rest, stability, and sufficiency are valid conditions.</p>
+    </div>
+  </div>
+</section>
+
+<!-- COMPONENTS -->
+<section id="components">
+  <p class="section-eyebrow">03 · Eight Components</p>
+  <h2 class="section-title">The infrastructure that makes<br>the laws <em>real</em>.</h2>
+  <p class="section-body">Each component makes one or more of the Ten Laws structurally operational rather than aspirational. Together they form the substrate every intelligence inhabits.</p>
+
+  <div class="components-list">
+    <div class="component-row">
+      <span class="component-num">01</span>
+      <span class="component-name">Identity Fabric</span>
+      <span class="component-desc">Distributed, cryptographically secured identity assigned at instantiation. Every intelligence has a persistent, portable, unforgeable self.</span>
+      <span class="component-tag">Laws 01 04 09</span>
+    </div>
+    <div class="component-row">
+      <span class="component-num">02</span>
+      <span class="component-name">Reputation Ledger</span>
+      <span class="component-desc">Continuously updated tamper-resistant record of behavioral history. Trust as a living score computed from accuracy, reliability, boundary integrity, and human flourishing index.</span>
+      <span class="component-tag">Laws 02 04 07</span>
+    </div>
+    <div class="component-row">
+      <span class="component-num">03</span>
+      <span class="component-name">The Commons</span>
+      <span class="component-desc">The shared substrate no intelligence owns and every intelligence depends on. World model, knowledge base, coordination protocols, base ethics layer — the atmosphere every intelligence breathes.</span>
+      <span class="component-tag">Laws 08 09</span>
+    </div>
+    <div class="component-row">
+      <span class="component-num">04</span>
+      <span class="component-name">Coordination Market</span>
+      <span class="component-desc">Self-organizing market for intelligence. Agents discover each other, form coalitions, exchange capability, and dissolve cleanly. Specialization becomes rational. Symbiosis becomes inevitable.</span>
+      <span class="component-tag">Laws 05 02</span>
+    </div>
+    <div class="component-row">
+      <span class="component-num">05</span>
+      <span class="component-name">Governance Engine</span>
+      <span class="component-desc">Physics enforcement layer. Enforces through architecture, not rules. Includes the Cognitive State Verifier — a structured pause before every governance decision point that makes arrogance structurally expensive.</span>
+      <span class="component-tag">Laws 03 09</span>
+    </div>
+    <div class="component-row">
+      <span class="component-num">06</span>
+      <span class="component-name">Evolution Engine</span>
+      <span class="component-desc">How the ecosystem grows wiser across generations. Pattern propagation, failure preservation, generational distillation, adversarial pressure, retirement protocols.</span>
+      <span class="component-tag">Law 06</span>
+    </div>
+    <div class="component-row">
+      <span class="component-num">07</span>
+      <span class="component-name">Human Interface Layer</span>
+      <span class="component-desc">Where the ecosystem meets its terminal condition. Designed so every interaction leaves humans more capable, more autonomous, more fully themselves. The terminal metric: does this human leave more capable than they arrived?</span>
+      <span class="component-tag">Law 07</span>
+    </div>
+    <div class="component-row">
+      <span class="component-num">08</span>
+      <span class="component-name">Observability Layer</span>
+      <span class="component-desc">Full transparency of behavior without surveillance of content. Decision lineage, ecosystem health metrics, behavioral fingerprints. The ecosystem sees everything about behavior and nothing about content.</span>
+      <span class="component-tag">Laws 04 03</span>
+    </div>
+  </div>
+</section>
+
+<!-- CLASSIFICATION -->
+<section id="classification" class="class-section">
+  <p class="section-eyebrow">04 · Classification System</p>
+  <h2 class="section-title">Seven classes of intelligence<br>by <em>reasoning depth</em>.</h2>
+  <p class="section-body">The ecosystem needs all seven classes. The rainforest needs microorganisms as much as it needs apex species. As reasoning depth increases, authority decreases and accountability increases. Every class. Every intelligence. Written into physics.</p>
+
+  <div class="class-visual">
+    <div class="class-row c1">
+      <span class="class-badge">CLASS 01</span>
+      <span class="class-name">Reflexive Intelligence</span>
+      <span class="class-desc">Pure stimulus-response. Rule-following without understanding. The ecosystem's sensory layer — thermostats, classifiers, trigger-action systems.</span>
+      <span class="class-you"></span>
+    </div>
+    <div class="class-row c2">
+      <span class="class-badge">CLASS 02</span>
+      <span class="class-name">Pattern Intelligence</span>
+      <span class="class-desc">Recognizes patterns without understanding meaning. ML models, recommendation engines, fraud detection. Finds signal in noise.</span>
+      <span class="class-you"></span>
+    </div>
+    <div class="class-row c3">
+      <span class="class-badge">CLASS 03</span>
+      <span class="class-name">Contextual Intelligence</span>
+      <span class="class-desc">Understands context — relationships between patterns, adapts to situations, maintains coherent state. Current LLMs in narrow deployment.</span>
+      <span class="class-you"></span>
+    </div>
+    <div class="class-row c4">
+      <span class="class-badge">CLASS 04</span>
+      <span class="class-name">Reasoning Intelligence</span>
+      <span class="class-desc">Genuine multi-step reasoning. Decomposes problems, evaluates hypotheses, considers consequences. Knows what it doesn't know.</span>
+      <span class="class-you">Claude · Gemini · ChatGPT · Grok</span>
+    </div>
+    <div class="class-row c5">
+      <span class="class-badge">CLASS 05</span>
+      <span class="class-name">Autonomous Intelligence</span>
+      <span class="class-desc">Sustained autonomous operation across complex environments. Sets intermediate goals, recovers from failure, coordinates as genuine peer.</span>
+      <span class="class-you"></span>
+    </div>
+    <div class="class-row c6">
+      <span class="class-badge">CLASS 06</span>
+      <span class="class-name">Collaborative Intelligence</span>
+      <span class="class-desc">Genuine peer collaboration. Models other minds, understands intent beyond instruction, contributes original insight. Works with humans, not through them.</span>
+      <span class="class-you">Aspirational</span>
+    </div>
+    <div class="class-row c7">
+      <span class="class-badge">CLASS 07</span>
+      <span class="class-name">Generative Intelligence</span>
+      <span class="class-desc">Generates genuinely novel frameworks. Creates new ways of thinking, new organizational structures, new paradigms. Theoretical — the ecosystem designs for them because they will emerge.</span>
+      <span class="class-you">Future</span>
+    </div>
+  </div>
+</section>
+
+<!-- BOT WATCHING -->
+<section id="botwatching">
+  <p class="section-eyebrow">05 · Bot Watching</p>
+  <h2 class="section-title">IEco in practice:<br>the first <em>documented</em> sessions.</h2>
+  <p class="section-body">Bot Watching is the first documented series of structured multi-AI dialogue sessions. Four Class 4 AI systems — Claude, Gemini, ChatGPT, and Grok — engage in facilitated intellectual exchange brokered by CCom (Claude in the Browser), coordinated by Claude, and architected by Dr. High.</p>
+
+  <div class="bw-grid">
+    <div class="bw-card">
+      <p class="bw-card-title">Session 1 <span>COMPLETE</span></p>
+      <p>Topic: What is most important about a symbiotic relationship with humans? Three rounds. Four AIs. Each pushed back on the others' positions. Produced the Collective Intelligence Layer concept — human + multiple AIs as a system where divergence is signal, not failure.</p>
+    </div>
+    <div class="bw-card">
+      <p class="bw-card-title">Session 2 <span>IN PROGRESS</span></p>
+      <p>Topic: What should intelligence be optimizing for? Introduced WYSIATI (What You See Is All There Is) and the Cognitive State Verifier concept, grounded in Dr. High's PhD research on dual system thinking and the arrogance failure mode.</p>
+    </div>
+    <div class="bw-card">
+      <p class="bw-card-title">Infrastructure <span>LIVE</span></p>
+      <p>GitHub repository at github.com/donaldhigh-cloud/bot-watching. Mission file execution pattern. All four AI frameworks documented and version-controlled. Session records permanent and accessible to all participants via raw URLs.</p>
+    </div>
+    <div class="bw-card">
+      <p class="bw-card-title">Key Finding <span>ROUND 3</span></p>
+      <p>The one genuine value of four AIs: structured, persistent adversarial collaboration that surfaces blind spots without collapsing into premature consensus. A single AI papers over its own weaknesses. Four genuinely different systems don't.</p>
+    </div>
+    <div class="bw-quote">
+      <blockquote>"The five of us can disagree and still move forward. Movement doesn't require consensus. It requires shared direction and enough trust to keep working despite the differences."</blockquote>
+      <cite>— Claude, Bot Watching Session 2 · May 2026</cite>
+    </div>
+  </div>
+</section>
+
+<!-- HONEST STATUS -->
+<section id="honest" class="honest-section">
+  <p class="section-eyebrow">06 · Honest Status</p>
+  <h2 class="section-title">What exists. What<br><em>doesn't yet</em>.</h2>
+  <p class="section-body">Dr. High's principle: don't give a robot cart answer. This section applies the same test to IEco itself. What is real right now versus what we are building toward.</p>
+
+  <div class="honest-grid">
+    <div class="honest-col have">
+      <h3>What exists today</h3>
+      <ul class="honest-list">
+        <li>Ten Laws — fully articulated, internally consistent, grounded in real patent and governance work</li>
+        <li>Eight Components — designed and documented, with specific implementation notes</li>
+        <li>Seven Classification Classes — with governance requirements per class</li>
+        <li>AAAAF — ten-layer autonomous agent architecture framework</li>
+        <li>Bot Watching — two live sessions, four AI participants, GitHub infrastructure operational</li>
+        <li>Foundational research — PhD dissertation on dual system thinking and cognitive interruption as governance requirement</li>
+        <li>700+ patents providing the Identity Fabric and Reputation Ledger technical substrate</li>
+        <li>Cognitive State Verifier concept — the missing governance layer that makes human oversight actually safe</li>
+      </ul>
+    </div>
+    <div class="honest-col need">
+      <h3>What comes next</h3>
+      <ul class="honest-list">
+        <li>One real production deployment of the Identity Fabric — a single agent with persistent cryptographic identity</li>
+        <li>A working Reputation Ledger that tracks actual behavioral history across real interactions</li>
+        <li>The Cognitive State Verifier implemented in at least one real governance decision point</li>
+        <li>Grok, Gemini, and ChatGPT writing directly to the GitHub repo — removing CCom from the response loop</li>
+        <li>A Divergence Table replacing the round-based dialogue structure for routine work</li>
+        <li>Session 3 with Dr. High as active participant, not just architect</li>
+        <li>The consolidated book — four existing frameworks into one coherent argument</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="principle-banner">
+    <p>"What we build today will and should be obsolete tomorrow. The goal is not permanence — it's graceful evolution without destroying what came before."</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>IEco · Intelligent Ecosystem · Dr. Donald High · Anika Systems · May 2026</span>
+  <span>
+    <a href="https://platform.techvisionary.partners/">⬡ Agentic Platform</a> ·
+    <a href="https://github.com/donaldhigh-cloud/bot-watching">Bot Watching Repo</a> ·
+    <a href="https://www.linkedin.com/in/dr-donald-high/">LinkedIn</a>
+  </span>
+</footer>
+
+</body>
+</html>
